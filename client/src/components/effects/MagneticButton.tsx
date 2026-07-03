@@ -19,40 +19,40 @@ interface MagneticButtonProps {
 }
 
 /**
- * Flat, professional variants — clean fills, hairline borders, calm hover
- * states. No 3D bevels, no motion.
+ * Flat, professional variants with a clean three-tier hierarchy:
+ * primary (solid) → secondary (bordered) → ghost (text). font-medium weight
+ * and ~8px radius, matching Vercel/Linear. No pills, no bevels, no motion.
  */
 const variantStyles: Record<NonNullable<MagneticButtonProps["variant"]>, string> = {
   primary: cn(
-    "font-semibold",
+    "font-medium",
     "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)]",
     "border border-transparent",
     "hover:bg-[var(--btn-primary-bg-hover)]",
   ),
   secondary: cn(
-    "text-text-primary font-semibold",
-    "bg-surface-2 backdrop-blur-md",
-    "border border-hairline",
-    "hover:border-hairline-strong",
-  ),
-  ghost: cn(
-    "text-text-secondary font-medium",
-    "bg-surface-1",
-    "border border-hairline",
-    "hover:bg-surface-2 hover:border-hairline-strong hover:text-text-primary",
-  ),
-  outline: cn(
-    "text-text-primary font-medium",
+    "font-medium text-text-primary",
     "bg-transparent",
     "border border-hairline-strong",
-    "hover:bg-surface-1",
+    "hover:bg-surface-1 hover:border-text-muted",
+  ),
+  ghost: cn(
+    "font-medium text-text-secondary",
+    "bg-transparent border border-transparent",
+    "hover:bg-surface-1 hover:text-text-primary",
+  ),
+  outline: cn(
+    "font-medium text-text-primary",
+    "bg-transparent",
+    "border border-hairline-strong",
+    "hover:bg-surface-1 hover:border-text-muted",
   ),
 };
 
 const sizeStyles = {
-  sm: "px-3.5 h-8 text-[13px] rounded-full gap-1.5",
-  md: "px-4 h-10 text-sm rounded-full gap-1.5",
-  lg: "px-5 h-11 text-sm rounded-full gap-2",
+  sm: "px-3 h-8 text-[13px] rounded-lg gap-1.5",
+  md: "px-4 h-9 text-sm rounded-lg gap-1.5",
+  lg: "px-5 h-11 text-sm rounded-lg gap-2",
 };
 
 export function MagneticButton({
