@@ -69,7 +69,7 @@ export function Hero() {
 
       <motion.div
         className="section-container relative z-10 w-full"
-        style={{ paddingTop: "clamp(90px, 12vh, 130px)", paddingBottom: "clamp(40px, 6vh, 72px)" }}
+        style={{ paddingTop: "clamp(96px, 11vh, 120px)", paddingBottom: "clamp(96px, 11vh, 120px)" }}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
