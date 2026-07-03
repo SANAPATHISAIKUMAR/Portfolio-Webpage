@@ -21,36 +21,33 @@ interface MagneticButtonProps {
 }
 
 /**
- * Restrained, "product-company" variants: tight layered shadows instead of
- * neon halos, a hairline top highlight for depth, and calm hover states.
+ * Flat, "normal" variants — no beveled inset highlights or layered drop
+ * shadows. Clean fills, hairline borders, calm hover states.
  */
 const variantStyles: Record<NonNullable<MagneticButtonProps["variant"]>, string> = {
   primary: cn(
     "text-white font-semibold",
-    "bg-[linear-gradient(180deg,#4b8bf7_0%,#3B82F6_45%,#6d43e0_100%)]",
-    "border border-white/15",
-    // Hairline top-inset highlight + soft, tight ambient shadow (no neon).
-    "shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(9,12,26,0.4),0_6px_16px_-6px_rgba(59,130,246,0.5)]",
-    "hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_2px_4px_rgba(9,12,26,0.45),0_10px_28px_-8px_rgba(99,102,241,0.6)]",
+    "bg-gradient-to-r from-accent-blue to-accent-purple",
+    "border border-transparent",
+    "hover:brightness-110",
   ),
   secondary: cn(
     "text-text-primary font-semibold",
-    "bg-white/[0.06] backdrop-blur-md",
-    "border border-white/[0.14]",
-    "shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.25)]",
-    "hover:bg-white/[0.1] hover:border-white/[0.22]",
+    "bg-surface-2 backdrop-blur-md",
+    "border border-hairline",
+    "hover:bg-surface-2 hover:border-hairline-strong",
   ),
   ghost: cn(
     "text-text-secondary font-medium",
-    "bg-white/[0.04]",
-    "border border-white/[0.08]",
-    "hover:bg-white/[0.08] hover:border-white/[0.16] hover:text-text-primary",
+    "bg-surface-1",
+    "border border-hairline",
+    "hover:bg-surface-2 hover:border-hairline-strong hover:text-text-primary",
   ),
   outline: cn(
     "text-text-primary font-medium",
     "bg-transparent",
-    "border border-white/[0.16]",
-    "hover:border-white/[0.32] hover:bg-white/[0.04]",
+    "border border-hairline-strong",
+    "hover:bg-surface-1",
   ),
 };
 
@@ -103,12 +100,10 @@ export function MagneticButton({
     y.set(0);
   };
 
-  const showSheen = variant === "primary" || variant === "secondary";
-
   const baseStyles = cn(
-    "group relative inline-flex items-center justify-center whitespace-nowrap overflow-hidden",
-    "font-medium tracking-[-0.01em] isolate",
-    "transition-[background-color,border-color,box-shadow,color] duration-200 ease-out",
+    "relative inline-flex items-center justify-center whitespace-nowrap",
+    "font-medium tracking-[-0.01em]",
+    "transition-[background-color,border-color,filter,color] duration-200 ease-out",
     "cursor-pointer select-none",
     "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     variantStyles[variant],
@@ -120,23 +115,12 @@ export function MagneticButton({
   const motionStyle: MotionStyle = magneticActive ? { x: springX, y: springY } : {};
 
   const content = (
-    <>
-      {/* Shine sweep — a single calm diagonal pass on hover */}
-      {showSheen && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit]"
-        >
-          <span className="absolute inset-y-0 left-[-60%] w-1/2 skew-x-[-20deg] bg-linear-to-r from-transparent via-white/25 to-transparent opacity-0 transition-all duration-[750ms] ease-out group-hover:left-[130%] group-hover:opacity-100" />
-        </span>
-      )}
-      <motion.span
-        className="relative z-10 flex items-center gap-[inherit]"
-        style={magneticActive ? { x: labelX, y: labelY } : undefined}
-      >
-        {children}
-      </motion.span>
-    </>
+    <motion.span
+      className="relative z-10 flex items-center gap-[inherit]"
+      style={magneticActive ? { x: labelX, y: labelY } : undefined}
+    >
+      {children}
+    </motion.span>
   );
 
   const shared = {
