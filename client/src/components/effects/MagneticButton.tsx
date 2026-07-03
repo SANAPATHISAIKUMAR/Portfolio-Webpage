@@ -24,10 +24,10 @@ interface MagneticButtonProps {
  */
 const variantStyles: Record<NonNullable<MagneticButtonProps["variant"]>, string> = {
   primary: cn(
-    "text-white font-semibold",
-    "bg-gradient-to-r from-accent-blue to-accent-purple",
+    "font-semibold",
+    "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)]",
     "border border-transparent",
-    "hover:brightness-110",
+    "hover:bg-[var(--btn-primary-bg-hover)]",
   ),
   secondary: cn(
     "text-text-primary font-semibold",

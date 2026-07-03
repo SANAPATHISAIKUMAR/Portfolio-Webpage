@@ -43,6 +43,11 @@
   --hairline-strong: rgba(255, 255, 255, 0.14);
   --nav-bg: rgba(5, 8, 22, 0.72);
 
+  /* Monochrome primary button — inverts against the page (dark theme = white). */
+  --btn-primary-bg: #F8FAFC;
+  --btn-primary-bg-hover: #E2E8F0;
+  --btn-primary-fg: #0B0D12;
+
   --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: var(--font-space-grotesk), 'Space Grotesk', 'Inter', sans-serif;
 }
@@ -69,6 +74,10 @@
   --hairline: rgba(10, 12, 20, 0.09);
   --hairline-strong: rgba(10, 12, 20, 0.16);
   --nav-bg: rgba(255, 255, 255, 0.75);
+
+  --btn-primary-bg: #0B0D12;
+  --btn-primary-bg-hover: #23262E;
+  --btn-primary-fg: #FFFFFF;
 }
 
 .light body {
