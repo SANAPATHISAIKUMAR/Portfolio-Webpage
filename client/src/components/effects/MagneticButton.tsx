@@ -1,14 +1,12 @@
 "use client";
 
-import { type ReactNode, useRef } from "react";
-import { motion, useMotionValue, useSpring, type MotionStyle } from "framer-motion";
-import { usePrefersReducedMotion } from "../../hooks/useMediaQuery";
+import { type ReactNode } from "react";
 import { cn } from "../../lib/utils";
 
 interface MagneticButtonProps {
   children: ReactNode;
   className?: string;
-  /** Magnetic pull factor (0 = none). Kept subtle by default. */
+  /** Deprecated no-op — buttons are static now. Kept for call-site compatibility. */
   strength?: number;
   onClick?: () => void;
   href?: string;
@@ -21,8 +19,8 @@ interface MagneticButtonProps {
 }
 
 /**
- * Flat, "normal" variants — no beveled inset highlights or layered drop
- * shadows. Clean fills, hairline borders, calm hover states.
+ * Flat, professional variants — clean fills, hairline borders, calm hover
+ * states. No 3D bevels, no motion.
  */
 const variantStyles: Record<NonNullable<MagneticButtonProps["variant"]>, string> = {
   primary: cn(
@@ -35,7 +33,7 @@ const variantStyles: Record<NonNullable<MagneticButtonProps["variant"]>, string>
     "text-text-primary font-semibold",
     "bg-surface-2 backdrop-blur-md",
     "border border-hairline",
-    "hover:bg-surface-2 hover:border-hairline-strong",
+    "hover:border-hairline-strong",
   ),
   ghost: cn(
     "text-text-secondary font-medium",
@@ -57,12 +55,9 @@ const sizeStyles = {
   lg: "px-7 h-[52px] text-[15px] rounded-full gap-2",
 };
 
-const SPRING = { stiffness: 260, damping: 18, mass: 0.6 };
-
 export function MagneticButton({
   children,
   className = "",
-  strength = 0.35,
   onClick,
   href,
   target,
@@ -72,36 +67,8 @@ export function MagneticButton({
   disabled,
   "aria-label": ariaLabel,
 }: MagneticButtonProps) {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const ref = useRef<HTMLElement>(null);
-
-  // Button body follows the cursor; the label follows a touch further for depth.
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, SPRING);
-  const springY = useSpring(y, SPRING);
-  // Label drifts a touch further than the body → subtle parallax depth.
-  const labelX = useSpring(springX, { stiffness: 200, damping: 16, mass: 0.7 });
-  const labelY = useSpring(springY, { stiffness: 200, damping: 16, mass: 0.7 });
-
-  const magneticActive = !prefersReducedMotion && strength > 0 && !disabled;
-
-  const handleMove = (e: React.MouseEvent) => {
-    if (!magneticActive || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const relX = e.clientX - (rect.left + rect.width / 2);
-    const relY = e.clientY - (rect.top + rect.height / 2);
-    x.set(relX * strength);
-    y.set(relY * strength);
-  };
-
-  const handleLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
   const baseStyles = cn(
-    "relative inline-flex items-center justify-center whitespace-nowrap",
+    "inline-flex items-center justify-center whitespace-nowrap",
     "font-medium tracking-[-0.01em]",
     "transition-[background-color,border-color,filter,color] duration-200 ease-out",
     "cursor-pointer select-none",
@@ -112,45 +79,30 @@ export function MagneticButton({
     className
   );
 
-  const motionStyle: MotionStyle = magneticActive ? { x: springX, y: springY } : {};
-
-  const content = (
-    <motion.span
-      className="relative z-10 flex items-center gap-[inherit]"
-      style={magneticActive ? { x: labelX, y: labelY } : undefined}
-    >
-      {children}
-    </motion.span>
-  );
-
-  const shared = {
-    ref: ref as never,
-    className: baseStyles,
-    style: motionStyle,
-    onMouseMove: handleMove,
-    onMouseLeave: handleLeave,
-    whileTap: disabled ? undefined : { scale: 0.97 },
-    transition: { scale: { duration: 0.12, ease: "easeOut" } },
-    "aria-label": ariaLabel,
-  } as const;
-
   if (href) {
     return (
-      <motion.a
-        {...shared}
+      <a
         href={href}
         target={target}
         rel={target === "_blank" ? "noopener noreferrer" : undefined}
         download={download}
+        className={baseStyles}
+        aria-label={ariaLabel}
       >
-        {content}
-      </motion.a>
+        {children}
+      </a>
     );
   }
 
   return (
-    <motion.button {...shared} type="button" onClick={onClick} disabled={disabled}>
-      {content}
-    </motion.button>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={baseStyles}
+      aria-label={ariaLabel}
+    >
+      {children}
+    </button>
   );
 }
