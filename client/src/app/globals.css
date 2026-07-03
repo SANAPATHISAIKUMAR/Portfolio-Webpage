@@ -35,8 +35,44 @@
 
   --nav-height: 80px;
 
+  /* Neutral surface tokens (theme-aware) — replace ad-hoc white/[0.0x] overlays
+     so components render correctly in both themes. */
+  --surface-1: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
+  --nav-bg: rgba(5, 8, 22, 0.72);
+
   --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: var(--font-space-grotesk), 'Space Grotesk', 'Inter', sans-serif;
+}
+
+/* ===================================
+   LIGHT THEME OVERRIDES
+   Premium off-white (Apple/Vercel light) — not stark white. Accent hues stay
+   the brand colors; only surfaces, text, and hairlines flip.
+   =================================== */
+
+.light {
+  --color-bg: #FBFBFD;
+  --color-bg-secondary: #F3F4F7;
+  --color-text-primary: #0B0D12;
+  --color-text-secondary: #4A5568;
+  --color-text-muted: #6B7280;
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(10, 12, 20, 0.08);
+  --glass-shadow: 0 4px 30px rgba(10, 12, 20, 0.08);
+
+  --surface-1: rgba(10, 12, 20, 0.035);
+  --surface-2: rgba(10, 12, 20, 0.06);
+  --hairline: rgba(10, 12, 20, 0.09);
+  --hairline-strong: rgba(10, 12, 20, 0.16);
+  --nav-bg: rgba(255, 255, 255, 0.75);
+}
+
+.light body {
+  background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.06) 0%, transparent 70%);
 }
 
 /* ===================================

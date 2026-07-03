@@ -6,14 +6,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#050816",
-        "background-secondary": "#0B1120",
+        // Theme-aware semantic tokens (driven by CSS variables in globals.css).
+        background: "var(--color-bg)",
+        "background-secondary": "var(--color-bg-secondary)",
+        "text-primary": "var(--color-text-primary)",
+        "text-secondary": "var(--color-text-secondary)",
+        "text-muted": "var(--color-text-muted)",
+        // Neutral surface + hairline tokens for theme-correct overlays/borders.
+        surface: {
+          1: "var(--surface-1)",
+          2: "var(--surface-2)",
+        },
+        hairline: {
+          DEFAULT: "var(--hairline)",
+          strong: "var(--hairline-strong)",
+        },
+        // Brand accents stay constant across themes.
         "accent-blue": "#3B82F6",
         "accent-purple": "#7C3AED",
         "accent-cyan": "#06B6D4",
-        "text-primary": "#F8FAFC",
-        "text-secondary": "#94A3B8",
-        "text-muted": "#7C8AA0",
         glass: {
           DEFAULT: "rgba(11, 17, 32, 0.6)",
           light: "rgba(11, 17, 32, 0.4)",

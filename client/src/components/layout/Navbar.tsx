@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Download, Menu, X, ArrowUpRight, Mail } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "../ui/SocialIcons";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { siteConfig, navigationItems } from "../../config/site";
 import { cn } from "../../lib/utils";
 import { MagneticButton } from "../effects/MagneticButton";
@@ -13,20 +15,9 @@ export function Navbar() {
   const { progress, direction, isScrolled } = useScrollProgress(80);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth : 1280
-  );
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
-  const isMobile = windowWidth < 768;
-  const isTablet = windowWidth >= 768 && windowWidth < 1100;
-
-  useEffect(() => {
-    const onResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  // Track active section
+  // Track active section for nav highlighting.
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -43,11 +34,18 @@ export function Navbar() {
     return () => observer.disconnect();
   }, []);
 
-  // Lock scroll when mobile menu open
+  // Lock scroll when the mobile menu is open.
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isMobileMenuOpen]);
+
+  // Close the mobile menu if the viewport grows to desktop.
+  useEffect(() => {
+    if (isDesktop) setIsMobileMenuOpen(false);
+  }, [isDesktop]);
 
   const scrollTo = (href: string) => {
     document.getElementById(href.replace("#", ""))?.scrollIntoView({ behavior: "smooth" });
@@ -56,48 +54,45 @@ export function Navbar() {
 
   const isVisible = !isScrolled || direction === "up" || isMobileMenuOpen;
 
-  // Items shown in desktop nav
-  const desktopItems = isTablet
-    ? navigationItems.filter((n) =>
-        ["#about", "#projects", "#skills", "#contact"].includes(n.href)
-      )
-    : navigationItems;
-
   return (
     <>
-      {/* ── Progress bar ─────────────────────────────────────────── */}
+      {/* Scroll progress bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[2px] z-[1001] origin-left pointer-events-none"
+        className="fixed inset-x-0 top-0 z-[1001] h-[2px] origin-left pointer-events-none"
         style={{
           scaleX: progress,
           background: "linear-gradient(90deg, #3B82F6, #7C3AED, #06B6D4)",
         }}
       />
 
-      {/* ── Navbar container ─────────────────────────────────────── */}
+      {/* Navbar */}
       <motion.header
-        className="fixed top-0 left-0 right-0 z-[1000]"
+        className="fixed inset-x-0 top-0 z-[1000]"
         initial={{ y: -100 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <div
           className={cn(
-            "w-full backdrop-blur-xl transition-all duration-500",
-            // Full-width flush bar: transparent at top, glass + bottom border on scroll.
+            "w-full backdrop-blur-xl transition-colors duration-500",
             isScrolled
-              ? "bg-[#050816]/80 border-b border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
-              : "bg-transparent border-b border-transparent"
+              ? "border-b border-hairline shadow-[0_4px_24px_rgba(0,0,0,0.18)]"
+              : "border-b border-transparent"
           )}
+          style={{ background: isScrolled ? "var(--nav-bg)" : "transparent" }}
         >
-          <nav className="grid items-center grid-cols-[auto_1fr_auto] gap-x-6 px-5 sm:px-8 lg:px-12 py-3.5 max-w-[1600px] mx-auto">
-            {/* ── Col 1: Logo ─────────────────────────────────────── */}
+          <nav className="mx-auto grid max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-x-6 px-5 py-3.5 sm:px-8 lg:px-12">
+            {/* Logo */}
             <a
               href="#home"
-              onClick={(e) => { e.preventDefault(); scrollTo("#home"); }}
-              className="flex items-center gap-2.5 shrink-0 group"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo("#home");
+              }}
+              className="group flex shrink-0 items-center gap-2.5"
+              aria-label="Go to top"
             >
-              <div className="relative w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6] to-[#7C3AED]" />
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] to-[#06B6D4]"
@@ -105,126 +100,106 @@ export function Navbar() {
                   whileHover={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 />
-                <span className="relative z-10 text-white font-bold text-xs font-display">SK</span>
+                <span className="relative z-10 font-display text-xs font-bold text-white">SK</span>
               </div>
-              {!isMobile && !isTablet && (
-                <span className="text-[#F8FAFC] text-base font-semibold font-display tracking-tight">
-                  Sai Kumar
-                </span>
-              )}
+              <span className="hidden font-display text-base font-semibold tracking-tight text-text-primary sm:block">
+                Sai Kumar
+              </span>
             </a>
 
-            {/* ── Col 2: Nav links (centered) ──────────────────────── */}
-            {!isMobile ? (
-              <div className="flex items-center justify-center gap-2">
-                {desktopItems.map(({ href, label }) => {
-                  const active = activeSection === href.replace("#", "");
-                  return (
-                    <a
-                      key={href}
-                      href={href}
-                      onClick={(e) => { e.preventDefault(); scrollTo(href); }}
-                      className={cn(
-                        "relative px-4 py-2.5 rounded-lg text-[15px] font-medium",
-                        "transition-colors duration-200 whitespace-nowrap",
-                        active ? "text-[#F8FAFC]" : "text-[#94A3B8] hover:text-[#F8FAFC]"
-                      )}
-                    >
-                      {active && (
-                        <motion.span
-                          layoutId="nav-pill"
-                          className="absolute inset-0 rounded-lg bg-white/[0.08]"
-                          transition={{ type: "spring", stiffness: 380, damping: 34 }}
-                        />
-                      )}
-                      <span className="relative z-10">{label}</span>
-                    </a>
-                  );
-                })}
-              </div>
-            ) : (
-              /* Tablet/mobile: empty center */
-              <div />
-            )}
-
-            {/* ── Col 3: Action buttons ────────────────────────────── */}
-            <div className="flex items-center gap-2 shrink-0">
-              {!isMobile && (
-                <>
-                  {/* Resume — ghost, only on wide */}
-                  {!isTablet && (
-                    <MagneticButton
-                      href={siteConfig.resume}
-                      variant="ghost"
-                      size="sm"
-                      download
-                    >
-                      <Download size={13} />
-                      Resume
-                    </MagneticButton>
-                  )}
-
-                  {/* Hire Me — primary */}
-                  <MagneticButton
-                    variant="primary"
-                    size="sm"
-                    onClick={() => scrollTo("#contact")}
+            {/* Desktop nav links */}
+            <div className="hidden items-center justify-center gap-1 lg:flex">
+              {navigationItems.map(({ href, label }) => {
+                const active = activeSection === href.replace("#", "");
+                return (
+                  <a
+                    key={href}
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollTo(href);
+                    }}
+                    className={cn(
+                      "relative whitespace-nowrap rounded-lg px-4 py-2.5 text-[15px] font-medium transition-colors duration-200",
+                      active ? "text-text-primary" : "text-text-secondary hover:text-text-primary"
+                    )}
+                    aria-current={active ? "page" : undefined}
                   >
-                    Hire Me
-                    <ArrowUpRight size={14} />
-                  </MagneticButton>
-                </>
-              )}
+                    {active && (
+                      <motion.span
+                        layoutId="nav-pill"
+                        className="absolute inset-0 rounded-lg bg-surface-2"
+                        transition={{ type: "spring", stiffness: 380, damping: 34 }}
+                      />
+                    )}
+                    <span className="relative z-10">{label}</span>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Right actions */}
+            <div className="flex shrink-0 items-center gap-2">
+              <ThemeToggle />
+
+              {/* Desktop-only buttons */}
+              <div className="hidden items-center gap-2 lg:flex">
+                <MagneticButton href={siteConfig.resume} variant="ghost" size="sm" download>
+                  <Download size={13} />
+                  Resume
+                </MagneticButton>
+                <MagneticButton variant="primary" size="sm" onClick={() => scrollTo("#contact")}>
+                  Hire Me
+                  <ArrowUpRight size={14} />
+                </MagneticButton>
+              </div>
 
               {/* Mobile hamburger */}
-              {isMobile && (
-                <button
-                  aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-                  onClick={() => setIsMobileMenuOpen((v) => !v)}
-                  className={cn(
-                    "w-9 h-9 flex items-center justify-center rounded-xl",
-                    "border border-white/[0.09] bg-white/[0.04]",
-                    "text-[#94A3B8] hover:text-[#F8FAFC]",
-                    "hover:bg-white/[0.08] hover:border-white/[0.14]",
-                    "transition-all duration-200"
-                  )}
-                >
-                  {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-                </button>
-              )}
+              <button
+                type="button"
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen((v) => !v)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-hairline bg-surface-1 text-text-secondary transition-all duration-200 hover:border-hairline-strong hover:bg-surface-2 hover:text-text-primary lg:hidden"
+              >
+                {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
             </div>
           </nav>
         </div>
       </motion.header>
 
-      {/* ── Mobile full-screen menu ───────────────────────────────── */}
+      {/* Mobile full-screen menu */}
       <AnimatePresence>
-        {isMobileMenuOpen && isMobile && (
+        {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-[999] flex flex-col"
+            className="fixed inset-0 z-[999] flex flex-col lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
           >
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-[#050816]/95 backdrop-blur-2xl" />
+            <div
+              className="absolute inset-0 backdrop-blur-2xl"
+              style={{ background: "color-mix(in srgb, var(--color-bg) 94%, transparent)" }}
+            />
 
-            {/* Content */}
-            <nav className="relative flex flex-col items-center justify-center flex-1 gap-1 px-8">
+            <nav className="relative flex flex-1 flex-col items-center justify-center gap-1 px-8">
               {navigationItems.map(({ href, label }, i) => {
                 const active = activeSection === href.replace("#", "");
                 return (
                   <motion.a
                     key={href}
                     href={href}
-                    onClick={(e) => { e.preventDefault(); scrollTo(href); }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollTo(href);
+                    }}
                     className={cn(
-                      "w-full max-w-xs text-center py-3 px-6 rounded-xl",
-                      "text-xl font-display font-semibold transition-all duration-200",
+                      "w-full max-w-xs rounded-xl px-6 py-3 text-center font-display text-xl font-semibold transition-all duration-200",
                       active
-                        ? "text-[#3B82F6] bg-[#3B82F6]/10"
-                        : "text-[#F8FAFC] hover:text-[#3B82F6] hover:bg-white/[0.04]"
+                        ? "bg-accent-blue/10 text-accent-blue"
+                        : "text-text-primary hover:bg-surface-1 hover:text-accent-blue"
                     )}
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -235,15 +210,13 @@ export function Navbar() {
                 );
               })}
 
-              {/* Divider */}
               <motion.div
-                className="w-12 h-px bg-white/10 my-5"
+                className="my-5 h-px w-12 bg-hairline-strong"
                 initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 1, scaleX: 1 }}
                 transition={{ delay: navigationItems.length * 0.055 + 0.05 }}
               />
 
-              {/* Buttons */}
               <motion.div
                 className="flex items-center gap-3"
                 initial={{ opacity: 0, y: 10 }}
@@ -260,9 +233,8 @@ export function Navbar() {
                 </MagneticButton>
               </motion.div>
 
-              {/* Social */}
               <motion.div
-                className="flex items-center gap-2 mt-5"
+                className="mt-5 flex items-center gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: navigationItems.length * 0.055 + 0.2 }}
@@ -278,13 +250,7 @@ export function Navbar() {
                     target={label !== "Email" ? "_blank" : undefined}
                     rel={label !== "Email" ? "noopener noreferrer" : undefined}
                     aria-label={label}
-                    className={cn(
-                      "w-9 h-9 flex items-center justify-center rounded-xl",
-                      "text-[#64748B] hover:text-[#F8FAFC]",
-                      "border border-white/[0.07] bg-white/[0.03]",
-                      "hover:border-white/[0.14] hover:bg-white/[0.07]",
-                      "transition-all duration-200"
-                    )}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-hairline bg-surface-1 text-text-secondary transition-all duration-200 hover:border-hairline-strong hover:bg-surface-2 hover:text-text-primary"
                   >
                     {icon}
                   </a>
