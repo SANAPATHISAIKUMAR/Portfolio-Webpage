@@ -1,26 +1,30 @@
 import type { Experience } from "../types";
 
+// Reverse-chronological: current role first, then internships (Zidio Jul–Oct 2025,
+// Cognifyz Mar–Apr 2025). Source of truth: ATS résumé + confirmed sequence
+// (internships first, then Lystra).
+//
+// NOTE: Lystra is not on the résumé (it started after Oct 2025). The start date
+// below is a placeholder ("2025-11") and the bullets are intentionally modest and
+// factual — replace both with your real details when ready.
 export const experiences: Experience[] = [
   {
     id: "lystra-pharma",
     role: "Associate Software Engineer",
     company: "Lystra Pharma",
     companyUrl: "https://lystrapharma.com",
-    location: "India",
-    startDate: "2024-01",
+    location: "Visakhapatnam, India",
+    startDate: "2025-11", // TODO: confirm exact start month with Sai
     description:
-      "Leading MERN stack development for a healthcare technology platform. Building scalable backend APIs, implementing complex healthcare workflows, and creating intuitive user interfaces for medical professionals and patients.",
+      "MERN-stack development for a healthcare technology platform — building REST APIs, backend services, and responsive React interfaces used across the product.",
     achievements: [
-      "Architected and developed RESTful APIs serving 10,000+ daily requests",
-      "Built healthcare workflow automation reducing manual processes by 40%",
-      "Implemented secure patient data management with HIPAA-compliant practices",
-      "Developed responsive React dashboards for real-time analytics",
-      "Collaborated with cross-functional teams to ship features bi-weekly",
-      "Optimized database queries resulting in 60% faster page load times",
+      "Develop and maintain REST APIs and backend services on the MERN stack",
+      "Build responsive React interfaces for a healthcare technology platform",
+      "Collaborate with the team to ship and iterate on product features",
     ],
     technologies: [
       "React", "Node.js", "Express", "MongoDB", "TypeScript",
-      "TailwindCSS", "REST APIs", "JWT", "Redis", "AWS",
+      "TailwindCSS", "REST APIs",
     ],
     type: "fulltime",
   },
