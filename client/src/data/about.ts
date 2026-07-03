@@ -4,7 +4,7 @@ import type { TimelineItem } from "../types";
 // standard résumé convention. Source of truth: ATS résumé + confirmed sequence.
 export const aboutTimeline: TimelineItem[] = [
   {
-    year: "2025 — Present",
+    year: "2026 — Present",
     title: "Associate Software Engineer — Lystra Pharma",
     description:
       "Building MERN-stack REST APIs, backend services, and responsive React interfaces for a healthcare technology platform.",

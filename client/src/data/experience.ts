@@ -4,9 +4,9 @@ import type { Experience } from "../types";
 // Cognifyz Mar–Apr 2025). Source of truth: ATS résumé + confirmed sequence
 // (internships first, then Lystra).
 //
-// NOTE: Lystra is not on the résumé (it started after Oct 2025). The start date
-// below is a placeholder ("2025-11") and the bullets are intentionally modest and
-// factual — replace both with your real details when ready.
+// NOTE: Lystra is not on the résumé (it started Jan 2026, after the internships).
+// The bullets below are intentionally modest and factual — replace with your real
+// achievements/metrics when ready.
 export const experiences: Experience[] = [
   {
     id: "lystra-pharma",
@@ -14,7 +14,7 @@ export const experiences: Experience[] = [
     company: "Lystra Pharma",
     companyUrl: "https://lystrapharma.com",
     location: "Visakhapatnam, India",
-    startDate: "2025-11", // TODO: confirm exact start month with Sai
+    startDate: "2026-01",
     description:
       "MERN-stack development for a healthcare technology platform — building REST APIs, backend services, and responsive React interfaces used across the product.",
     achievements: [
