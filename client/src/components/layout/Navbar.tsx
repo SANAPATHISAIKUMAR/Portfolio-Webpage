@@ -81,7 +81,7 @@ export function Navbar() {
           )}
           style={{ background: isScrolled ? "var(--nav-bg)" : "transparent" }}
         >
-          <nav className="mx-auto grid max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-x-6 px-5 py-3.5 sm:px-8 lg:px-12">
+          <nav className="mx-auto grid max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-x-6 px-5 py-3.5 sm:px-8 lg:px-12">
             {/* Logo */}
             <a
               href="#home"
@@ -89,7 +89,7 @@ export function Navbar() {
                 e.preventDefault();
                 scrollTo("#home");
               }}
-              className="group flex shrink-0 items-center gap-2.5"
+              className="group flex shrink-0 items-center gap-2.5 justify-self-start"
               aria-label="Go to top"
             >
               <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg">
@@ -139,7 +139,7 @@ export function Navbar() {
             </div>
 
             {/* Right actions */}
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2 justify-self-end">
               <ThemeToggle />
 
               {/* Desktop-only buttons */}

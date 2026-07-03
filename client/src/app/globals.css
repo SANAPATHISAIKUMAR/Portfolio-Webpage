@@ -101,6 +101,10 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Guard against any decorative element widening the page and pushing
+     centered content off-axis. */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -111,6 +115,8 @@ body {
   color: var(--color-text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
 }
 

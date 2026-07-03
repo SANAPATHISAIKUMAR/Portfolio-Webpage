@@ -68,7 +68,7 @@ export function Hero() {
       <ParticleField />
 
       <motion.div
-        className="section-container relative z-10 w-full"
+        className="relative z-10 mx-auto w-full max-w-4xl px-4 text-center sm:px-6"
         style={{ paddingTop: "clamp(96px, 11vh, 120px)", paddingBottom: "clamp(96px, 11vh, 120px)" }}
         variants={containerVariants}
         initial="hidden"
@@ -113,8 +113,8 @@ export function Hero() {
           {/* Headline */}
           <motion.h1
             variants={itemVariants}
-            className="mb-5 font-display font-bold tracking-tight text-text-primary"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.05 }}
+            className="mx-auto mb-5 max-w-3xl font-display font-bold tracking-tight text-text-primary"
+            style={{ fontSize: "clamp(2.25rem, 5vw, 4rem)", lineHeight: 1.05 }}
           >
             Building scalable,{" "}
             <br className="hidden sm:block" />
