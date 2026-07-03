@@ -161,13 +161,14 @@ export function Hero() {
             ))}
           </motion.div>
 
-          {/* CTAs */}
+          {/* CTAs — three equal-width buttons */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-wrap items-center justify-center gap-3 md:gap-4"
+            className="mx-auto grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3"
             style={{ marginBottom: "clamp(1.5rem, 3vw, 2rem)" }}
           >
             <MagneticButton
+              className="w-full"
               variant="primary"
               size="lg"
               onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
@@ -176,13 +177,20 @@ export function Hero() {
               <ArrowRight size={16} />
             </MagneticButton>
 
-            <MagneticButton variant="secondary" size="lg" href={siteConfig.resume} download>
+            <MagneticButton
+              className="w-full"
+              variant="secondary"
+              size="lg"
+              href={siteConfig.resume}
+              download
+            >
               <Download size={16} />
-              Download Resume
+              Resume
             </MagneticButton>
 
             <MagneticButton
-              variant="ghost"
+              className="w-full"
+              variant="secondary"
               size="lg"
               onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
             >
