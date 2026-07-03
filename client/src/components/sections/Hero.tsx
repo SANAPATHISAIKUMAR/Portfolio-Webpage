@@ -173,11 +173,11 @@ export function Hero() {
               onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
             >
               View Projects
-              <ArrowRight size={17} />
+              <ArrowRight size={16} />
             </MagneticButton>
 
             <MagneticButton variant="secondary" size="lg" href={siteConfig.resume} download>
-              <Download size={17} />
+              <Download size={16} />
               Download Resume
             </MagneticButton>
 

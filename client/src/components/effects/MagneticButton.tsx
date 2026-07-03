@@ -50,9 +50,9 @@ const variantStyles: Record<NonNullable<MagneticButtonProps["variant"]>, string>
 };
 
 const sizeStyles = {
-  sm: "px-4 h-9 text-[13px] rounded-full gap-1.5",
-  md: "px-5 h-11 text-sm rounded-full gap-2",
-  lg: "px-7 h-[52px] text-[15px] rounded-full gap-2",
+  sm: "px-3.5 h-8 text-[13px] rounded-full gap-1.5",
+  md: "px-4 h-10 text-sm rounded-full gap-1.5",
+  lg: "px-5 h-11 text-sm rounded-full gap-2",
 };
 
 export function MagneticButton({
