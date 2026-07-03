@@ -361,19 +361,8 @@ img {
   100% { --angle: 360deg; }
 }
 
-/* Subtle breathing glow on section headers */
-@keyframes breathe {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.15); }
-}
-
-.gradient-text {
-  animation: breathe 4s ease-in-out infinite;
-}
-
-.gradient-text-tri {
-  animation: breathe 4s ease-in-out infinite;
-}
+/* Gradient headings stay static — no brightness flicker. A premium restraint
+   choice: continuous pulsing on text reads as amateur. */
 
 /* ===================================
    MARQUEE ANIMATION

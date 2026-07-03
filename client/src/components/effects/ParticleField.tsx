@@ -10,7 +10,16 @@ interface Particle {
   vy: number;
   r: number;
   a: number;
+  c: string;
 }
+
+// Brand palette, weighted toward blue so the field reads calm, not rainbow.
+const PARTICLE_COLORS = [
+  "59, 130, 246",
+  "59, 130, 246",
+  "124, 58, 237",
+  "6, 182, 212",
+];
 
 /**
  * Lightweight Canvas 2D particle field used as a decorative Hero background.
@@ -33,7 +42,7 @@ export function ParticleField() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const count = isMobile ? 36 : 70;
+    const count = isMobile ? 24 : 46;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let width = 0;
     let height = 0;
@@ -57,10 +66,12 @@ export function ParticleField() {
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        r: Math.random() * 1.6 + 0.6,
-        a: Math.random() * 0.5 + 0.2,
+        // Slower drift → ambient, not busy.
+        vx: (Math.random() - 0.5) * 0.16,
+        vy: (Math.random() - 0.5) * 0.16,
+        r: Math.random() * 1.5 + 0.5,
+        a: Math.random() * 0.3 + 0.12,
+        c: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
       }));
     };
 
@@ -84,7 +95,7 @@ export function ParticleField() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(59, 130, 246, ${p.a})`;
+        ctx.fillStyle = `rgba(${p.c}, ${p.a})`;
         ctx.fill();
       }
 
