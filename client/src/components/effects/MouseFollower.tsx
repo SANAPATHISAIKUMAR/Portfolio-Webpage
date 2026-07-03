@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useIsMobile, usePrefersReducedMotion } from "../../hooks/useMediaQuery";

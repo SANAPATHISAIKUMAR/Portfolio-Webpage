@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { ExternalLink, ArrowRight, Bot, Rocket, Code2, Sparkles } from "lucide-react";
 import { GithubIcon } from "../ui/SocialIcons";

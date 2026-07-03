@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Mail, MapPin } from "lucide-react";
@@ -47,7 +49,7 @@ export function Contact() {
 
     setStatus("submitting");
 
-    const accessKey = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY as string | undefined;
 
     // Graceful fallback: if no serverless email key is configured, open the
     // visitor's mail client with the message pre-filled instead of failing.

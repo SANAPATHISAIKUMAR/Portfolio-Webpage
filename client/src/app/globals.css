@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@config "../tailwind.config.ts";
+@config "../../tailwind.config.ts";
 
 /* ===================================
    CSS CUSTOM PROPERTIES
@@ -34,6 +34,9 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 
   --nav-height: 80px;
+
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-space-grotesk), 'Space Grotesk', 'Inter', sans-serif;
 }
 
 /* ===================================
@@ -56,7 +59,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--color-bg);
   background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.05) 0%, transparent 70%);
   background-attachment: fixed;
@@ -66,7 +69,8 @@ body {
   min-height: 100vh;
 }
 
-#root {
+#root,
+body > div:first-child {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -113,7 +117,7 @@ body {
    =================================== */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;

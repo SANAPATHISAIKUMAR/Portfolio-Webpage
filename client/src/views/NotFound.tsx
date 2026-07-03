@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Home, ArrowLeft, Sparkles } from "lucide-react";
 import { MagneticButton } from "../components/effects/MagneticButton";

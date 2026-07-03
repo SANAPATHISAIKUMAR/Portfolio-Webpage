@@ -1,3 +1,5 @@
+"use client";
+
 import { Mail, ArrowUp, Heart } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "../ui/SocialIcons";
 import { motion } from "framer-motion";

@@ -2,11 +2,16 @@ import type { SiteConfig, NavItem } from "../types";
 
 export const siteConfig: SiteConfig = {
   name: "Sanapathi Sai Kumar",
-  title: "Sai Kumar — Full Stack Developer & UI/UX Designer",
+  title: "Sai Kumar — Associate Software Engineer | MERN & Full-Stack Developer",
   description:
-    "Full Stack Developer and UI/UX Designer building AI-integrated web applications with the MERN stack, Next.js, TypeScript, and Firebase. B.Tech CSE (AI & ML) student, hackathon team lead, and Meta PyTorch OpenEnv finalist.",
+    "Associate Software Engineer specializing in MERN-stack development — building scalable full-stack healthcare applications, responsive UIs, REST APIs, and AI-powered solutions, with growing expertise in AWS, cloud computing, and system design.",
   url: "https://saikumar.dev",
   ogImage: "/images/og-image.png",
+  role: "Associate Software Engineer",
+  company: "Lystra Pharma Private Limited",
+  availability: "Open to Software Engineer roles",
+  summary:
+    "I'm an Associate Software Engineer specializing in MERN-stack development with experience building scalable full-stack healthcare applications. I develop responsive user interfaces, REST APIs, backend services, and AI-powered solutions while continuously expanding my expertise in AWS, Cloud Computing, Machine Learning, and System Design.",
   links: [
     {
       platform: "GitHub",
@@ -43,11 +48,11 @@ export const navigationItems: NavItem[] = [
 ];
 
 export const heroRoles = [
-  "Full Stack Developer",
-  "UI/UX Designer",
-  "AI & ML Engineer",
+  "Associate Software Engineer",
   "MERN Stack Developer",
-  "Hackathon Team Lead",
+  "Full-Stack Developer",
+  "React & Node.js Developer",
+  "AI Integration Engineer",
 ];
 
 export const heroStats = [

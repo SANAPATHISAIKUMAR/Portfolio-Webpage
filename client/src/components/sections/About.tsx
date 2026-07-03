@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
 import { CounterAnimation } from "../effects/CounterAnimation";

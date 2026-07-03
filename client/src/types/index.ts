@@ -118,6 +118,14 @@ export interface SiteConfig {
   email: string;
   location: string;
   resume: string;
+  /** Current job title, e.g. "Associate Software Engineer". */
+  role?: string;
+  /** Current employer. */
+  company?: string;
+  /** Short availability line for the hero badge. */
+  availability?: string;
+  /** One-line professional summary reused across sections. */
+  summary?: string;
 }
 
 export interface GitHubRepo {

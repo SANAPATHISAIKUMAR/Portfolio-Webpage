@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { GitBranch, Star, GitFork, ExternalLink, Users, UserPlus, AlertCircle } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";

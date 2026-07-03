@@ -1,3 +1,5 @@
+"use client";
+
 import { Award, Calendar, Users, Code2 } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
 import { GlowCard } from "../effects/GlowCard";
