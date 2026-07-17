@@ -10,6 +10,12 @@ export interface Project {
   description: string;
   problem?: string;
   solution?: string;
+  /** What I specifically built/owned. */
+  contribution?: string;
+  /** Outcome / result in a short, scannable line. */
+  impact?: string;
+  /** Notable engineering challenge overcome. */
+  challenges?: string;
   techStack: string[];
   features: string[];
   image: string;
@@ -35,20 +41,28 @@ export interface Experience {
   type: "fulltime" | "internship" | "freelance" | "contract";
 }
 
-export interface Skill {
-  name: string;
-  icon: string;
-  proficiency: number; // 0-100
-  category: SkillCategory;
-}
-
 export type SkillCategory =
   | "frontend"
   | "backend"
   | "database"
   | "cloud"
+  | "devops"
+  | "languages"
   | "ai"
   | "design";
+
+/**
+ * A category of skills rendered as a card. No self-assigned proficiency
+ * numbers — senior engineers read "90% React" as junior signalling, so skills
+ * are simply grouped and listed. The `icon` is a lucide component supplied at
+ * the data layer.
+ */
+export interface SkillGroup {
+  id: SkillCategory;
+  label: string;
+  description: string;
+  skills: string[];
+}
 
 export interface Hackathon {
   id: string;
@@ -93,6 +107,28 @@ export interface BlogPost {
   publishedAt: string;
   readTime: string;
   category: string;
+}
+
+export interface Service {
+  id: string;
+  title: string;
+  description: string;
+  /** Concrete deliverables shown as bullet chips. */
+  features: string[];
+}
+
+export interface Certification {
+  id: string;
+  title: string;
+  issuer: string;
+  /** Human-readable issue date, e.g. "Mar 2025". */
+  date: string;
+  /** Public verification/credential URL. */
+  credentialUrl?: string;
+  /** Path under /public to the certificate image (png/jpg/webp). */
+  image?: string;
+  /** Skills the certificate attests to. */
+  skills?: string[];
 }
 
 export interface NavItem {

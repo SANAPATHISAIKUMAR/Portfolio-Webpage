@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Home, ArrowLeft, Sparkles } from "lucide-react";
-import { MagneticButton } from "../components/effects/MagneticButton";
-import { GradientBlobs } from "../components/effects/GradientBlobs";
+import { MagneticButton } from "./effects/MagneticButton";
+import { GradientBlobs } from "./effects/GradientBlobs";
 
 const containerVariants = {
   hidden: {},
@@ -57,7 +57,7 @@ export function NotFound() {
           variants={itemVariants}
           className="text-text-muted text-sm md:text-base mb-10 max-w-sm mx-auto leading-relaxed"
         >
-          The page you're looking for doesn't exist or has been moved. Let's get
+          The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get
           you back on track.
         </motion.p>
 
@@ -66,13 +66,7 @@ export function NotFound() {
           variants={itemVariants}
           className="flex flex-wrap items-center justify-center gap-4"
         >
-          <MagneticButton
-            variant="primary"
-            size="lg"
-            onClick={() => {
-              window.location.href = "/";
-            }}
-          >
+          <MagneticButton variant="primary" size="lg" href="/">
             <Home size={18} />
             Back Home
           </MagneticButton>

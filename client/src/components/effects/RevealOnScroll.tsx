@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
+import { EASE_OUT_EXPO } from "../../lib/motion";
+import { usePrefersReducedMotion } from "../../hooks/useMediaQuery";
 
 interface RevealOnScrollProps {
   children: ReactNode;
@@ -30,8 +32,10 @@ export function RevealOnScroll({
   const ref = useRef(null);
   const isInView = useInView(ref, { once, margin: "-80px" });
   const controls = useAnimation();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
-  const offset = directionOffsets[direction];
+  // Reduced motion: keep the gentle opacity fade but drop the directional slide.
+  const offset = prefersReducedMotion ? { x: 0, y: 0 } : directionOffsets[direction];
 
   useEffect(() => {
     if (isInView) {
@@ -58,7 +62,7 @@ export function RevealOnScroll({
           transition: {
             duration,
             delay,
-            ease: [0.16, 1, 0.3, 1],
+            ease: EASE_OUT_EXPO,
           },
         },
       }}

@@ -4,13 +4,20 @@ import { motion } from "framer-motion";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
 import { CounterAnimation } from "../effects/CounterAnimation";
 import { GlowCard } from "../effects/GlowCard";
+import { SectionHeading } from "../ui/SectionHeading";
+import { StatCard } from "../ui/StatCard";
 import { aboutTimeline, aboutDescription } from "../../data/about";
 import { heroStats } from "../../config/site";
 import { cn } from "../../lib/utils";
+import { EASE_OUT_EXPO } from "../../lib/motion";
 
 export function About() {
   return (
-    <section id="about" className="relative section-padding overflow-hidden">
+    <section
+      id="about"
+      aria-labelledby="about-heading"
+      className="relative section-padding overflow-hidden"
+    >
       {/* Background decoration */}
       <div
         className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none"
@@ -30,18 +37,16 @@ export function About() {
       <div className="section-container">
         {/* Section Header */}
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-accent-blue mb-3 block">
-              About Me
-            </span>
-            <h2 className="font-display text-section-title font-bold text-text-primary mb-4">
-              My Journey in{" "}
-              <span className="gradient-text">Tech</span>
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-section-subtitle">
-              From a curious student to building production-grade software — here's my story.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="About Me"
+            title={
+              <>
+                My Journey in <span className="gradient-text">Tech</span>
+              </>
+            }
+            subtitle="From a curious student to building production-grade software — here's my story."
+            headingId="about-heading"
+          />
         </RevealOnScroll>
 
         {/* Content Grid */}
@@ -52,7 +57,7 @@ export function About() {
               {aboutDescription.split("\n\n").map((paragraph, index) => (
                 <p
                   key={index}
-                  className="text-text-secondary leading-relaxed text-base md:text-lg"
+                  className="text-text-secondary leading-relaxed text-body-lg"
                 >
                   {paragraph}
                 </p>
@@ -61,27 +66,20 @@ export function About() {
               {/* Counter Stats */}
               <div className="grid grid-cols-2 gap-4 pt-6">
                 {heroStats.map((stat) => (
-                  <div
+                  <StatCard
                     key={stat.label}
-                    className="p-4 rounded-xl bg-background-secondary/40 border border-white/[0.04] hover:border-accent-blue/20 transition-all duration-300"
-                  >
-                    <div className="text-3xl font-display font-bold gradient-text mb-1">
-                      {stat.value.includes("+") ? (
+                    label={stat.label}
+                    valueClassName="gradient-text text-3xl"
+                    value={
+                      stat.value.includes("+") ? (
                         <>
-                          <CounterAnimation
-                            end={parseInt(stat.value)}
-                            duration={2000}
-                          />
-                          +
+                          <CounterAnimation end={parseInt(stat.value)} duration={2000} />+
                         </>
                       ) : (
                         stat.value
-                      )}
-                    </div>
-                    <div className="text-xs text-text-muted uppercase tracking-wider">
-                      {stat.label}
-                    </div>
-                  </div>
+                      )
+                    }
+                  />
                 ))}
               </div>
             </div>
@@ -104,7 +102,7 @@ export function About() {
                     transition={{
                       delay: index * 0.15,
                       duration: 0.6,
-                      ease: [0.16, 1, 0.3, 1],
+                      ease: EASE_OUT_EXPO,
                     }}
                   >
                     {/* Timeline dot — centered on left-6 line */}

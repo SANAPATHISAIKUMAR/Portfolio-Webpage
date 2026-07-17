@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { usePrefersReducedMotion } from "../../hooks/useMediaQuery";
+import { EASE_OUT_EXPO } from "../../lib/motion";
 
 interface TextRevealProps {
   text: string;
@@ -23,7 +24,13 @@ export function TextReveal({
 }: TextRevealProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once, margin: "-50px" });
+  const prefersReducedMotion = usePrefersReducedMotion();
   const words = text.split(" ");
+
+  // Reduced motion: render the text statically with no per-word slide-up.
+  if (prefersReducedMotion) {
+    return <Component className={className}>{text}</Component>;
+  }
 
   return (
     <Component ref={ref} className={className} aria-label={text}>
@@ -40,7 +47,7 @@ export function TextReveal({
                     transition: {
                       duration: 0.6,
                       delay: delay + wordIndex * staggerDelay,
-                      ease: [0.16, 1, 0.3, 1],
+                      ease: EASE_OUT_EXPO,
                     },
                   }
                 : {}

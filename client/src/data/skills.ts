@@ -1,59 +1,116 @@
-import type { Skill } from "../types";
+import type { LucideIcon } from "lucide-react";
+import {
+  Code2,
+  Server,
+  Database,
+  Cloud,
+  Wrench,
+  Binary,
+  BrainCircuit,
+  Palette,
+} from "lucide-react";
+import type { SkillGroup } from "../types";
 
-export const skills: Skill[] = [
-  // Frontend
-  { name: "React", icon: "⚛️", proficiency: 90, category: "frontend" },
-  { name: "Next.js", icon: "▲", proficiency: 82, category: "frontend" },
-  { name: "TypeScript", icon: "🔷", proficiency: 85, category: "frontend" },
-  { name: "JavaScript", icon: "🟨", proficiency: 90, category: "frontend" },
-  { name: "TailwindCSS", icon: "🎨", proficiency: 88, category: "frontend" },
-  { name: "HTML/CSS", icon: "🌐", proficiency: 92, category: "frontend" },
-  { name: "Reactstrap", icon: "🧱", proficiency: 78, category: "frontend" },
-  { name: "Responsive Design", icon: "📱", proficiency: 90, category: "frontend" },
+/** SkillGroup plus its lucide icon component (kept out of the shared type so
+ *  types/index.ts stays framework-agnostic). */
+export interface SkillGroupWithIcon extends SkillGroup {
+  icon: LucideIcon;
+}
 
-  // Backend & Languages
-  { name: "Node.js", icon: "🟢", proficiency: 82, category: "backend" },
-  { name: "Express.js", icon: "🚂", proficiency: 80, category: "backend" },
-  { name: "REST APIs", icon: "🔗", proficiency: 85, category: "backend" },
-  { name: "Python", icon: "🐍", proficiency: 82, category: "backend" },
-  { name: "Java", icon: "☕", proficiency: 72, category: "backend" },
-  { name: "C", icon: "🔧", proficiency: 70, category: "backend" },
-  { name: "C++", icon: "➕", proficiency: 72, category: "backend" },
-
-  // Database
-  { name: "MongoDB", icon: "🍃", proficiency: 85, category: "database" },
-  { name: "Mongoose", icon: "📦", proficiency: 80, category: "database" },
-  { name: "Firestore", icon: "🔥", proficiency: 82, category: "database" },
-
-  // Cloud & DevOps
-  { name: "Firebase", icon: "🔥", proficiency: 82, category: "cloud" },
-  { name: "Firebase Auth", icon: "🔐", proficiency: 80, category: "cloud" },
-  { name: "Cloud Functions", icon: "☁️", proficiency: 75, category: "cloud" },
-  { name: "Git/GitHub", icon: "🐙", proficiency: 88, category: "cloud" },
-  { name: "Containerization", icon: "🐳", proficiency: 70, category: "cloud" },
-
-  // AI / ML
-  { name: "Generative AI", icon: "✨", proficiency: 85, category: "ai" },
-  { name: "LLM Agents", icon: "🤖", proficiency: 82, category: "ai" },
-  { name: "Agentic AI", icon: "🕹️", proficiency: 80, category: "ai" },
-  { name: "NLP", icon: "🗣️", proficiency: 75, category: "ai" },
-  { name: "Reinforcement Learning", icon: "🎮", proficiency: 72, category: "ai" },
-  { name: "Adaptive ML", icon: "📈", proficiency: 72, category: "ai" },
-  { name: "PyTorch", icon: "🔦", proficiency: 70, category: "ai" },
-
-  // Design
-  { name: "Figma", icon: "🎨", proficiency: 85, category: "design" },
-  { name: "Adobe XD", icon: "🟪", proficiency: 80, category: "design" },
-  { name: "UI/UX Design", icon: "✏️", proficiency: 82, category: "design" },
-  { name: "Wireframing", icon: "📐", proficiency: 82, category: "design" },
-  { name: "Prototyping", icon: "🖼️", proficiency: 80, category: "design" },
+/**
+ * Skills grouped by discipline — no proficiency bars by design. The lists
+ * reflect real, hands-on tooling; recruiters scan for breadth + relevance, not
+ * self-scored percentages.
+ */
+export const skillGroups: SkillGroupWithIcon[] = [
+  {
+    id: "frontend",
+    label: "Frontend",
+    icon: Code2,
+    description: "Crafting fast, accessible, pixel-perfect interfaces.",
+    skills: [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "JavaScript",
+      "Tailwind CSS",
+      "HTML",
+      "CSS",
+      "SCSS",
+      "Bootstrap",
+      "Redux Toolkit",
+      "React Router",
+      "React Query",
+      "Axios",
+      "Shadcn UI",
+    ],
+  },
+  {
+    id: "backend",
+    label: "Backend",
+    icon: Server,
+    description: "Designing secure, scalable REST APIs and services.",
+    skills: [
+      "Node.js",
+      "Express.js",
+      "REST APIs",
+      "JWT",
+      "MVC",
+      "Authentication",
+      "Authorization",
+      "Passport",
+      "Socket.io",
+      "Swagger",
+    ],
+  },
+  {
+    id: "database",
+    label: "Database",
+    icon: Database,
+    description: "Modeling and querying data across SQL and NoSQL.",
+    skills: ["MongoDB", "SQL", "Firebase", "Firestore"],
+  },
+  {
+    id: "cloud",
+    label: "Cloud",
+    icon: Cloud,
+    description: "Deploying and running workloads on AWS.",
+    skills: ["AWS EC2", "AWS IAM", "AWS S3", "AWS VPC", "AWS RDS"],
+  },
+  {
+    id: "devops",
+    label: "DevOps",
+    icon: Wrench,
+    description: "Shipping with containers, CI/CD, and automation.",
+    skills: ["Docker", "Git", "GitHub", "Linux", "GitHub Actions", "Postman"],
+  },
+  {
+    id: "languages",
+    label: "Programming Languages",
+    icon: Binary,
+    description: "Core languages for problem-solving and systems.",
+    skills: ["Python", "Java", "C", "C++"],
+  },
+  {
+    id: "ai",
+    label: "Artificial Intelligence",
+    icon: BrainCircuit,
+    description: "Building LLM-powered, agentic product features.",
+    skills: [
+      "Machine Learning",
+      "Generative AI",
+      "Prompt Engineering",
+      "OpenAI API",
+      "Llama",
+      "Reinforcement Learning",
+      "Agentic AI",
+    ],
+  },
+  {
+    id: "design",
+    label: "UI/UX",
+    icon: Palette,
+    description: "Turning research and wireframes into usable design.",
+    skills: ["Figma", "Wireframing", "Prototyping", "User Experience"],
+  },
 ];
-
-export const skillCategories = [
-  { id: "frontend", label: "Frontend", icon: "🎨", color: "#3B82F6" },
-  { id: "backend", label: "Backend & Languages", icon: "⚙️", color: "#7C3AED" },
-  { id: "database", label: "Database", icon: "💾", color: "#06B6D4" },
-  { id: "cloud", label: "Cloud & DevOps", icon: "☁️", color: "#F59E0B" },
-  { id: "ai", label: "AI / ML", icon: "🤖", color: "#EC4899" },
-  { id: "design", label: "UI/UX Design", icon: "✏️", color: "#10B981" },
-] as const;

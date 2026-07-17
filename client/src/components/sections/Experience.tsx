@@ -1,20 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Briefcase, MapPin, Calendar, ChevronDown, ExternalLink } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
+import { SectionHeading } from "../ui/SectionHeading";
+import { Badge } from "../ui/Badge";
 import { formatDateRange } from "../../lib/utils";
 import { cn } from "../../lib/utils";
+import { EASE_OUT_EXPO } from "../../lib/motion";
 import { experiences } from "../../data/experience";
 
+/** Human labels for every employment type — avoids mislabeling freelance/contract as "Internship". */
+const TYPE_LABELS: Record<string, string> = {
+  fulltime: "Full Time",
+  internship: "Internship",
+  freelance: "Freelance",
+  contract: "Contract",
+};
+
 export function Experience() {
+  const prefersReducedMotion = useReducedMotion();
   const [expandedId, setExpandedId] = useState<string | null>(
     experiences[0]?.id ?? null
   );
 
   return (
-    <section id="experience" className="relative section-padding overflow-hidden">
+    <section
+      id="experience"
+      aria-labelledby="experience-heading"
+      className="relative section-padding overflow-hidden"
+    >
       {/* Background glow */}
       <div
         className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full opacity-10 pointer-events-none"
@@ -27,18 +43,16 @@ export function Experience() {
       <div className="section-container">
         {/* Header */}
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-accent-cyan mb-3 block">
-              Experience
-            </span>
-            <h2 className="font-display text-section-title font-bold text-text-primary mb-4">
-              Where I've{" "}
-              <span className="gradient-text">Worked</span>
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-section-subtitle">
-              Building impactful products at innovative companies.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="Experience"
+            title={
+              <>
+                Where I&apos;ve <span className="gradient-text">Worked</span>
+              </>
+            }
+            subtitle="Building impactful products at innovative companies."
+            headingId="experience-heading"
+          />
         </RevealOnScroll>
 
         {/* Timeline — single column, centered */}
@@ -48,10 +62,14 @@ export function Experience() {
 
           <div className="space-y-6">
             {experiences.map((exp, index) => {
-              const isExpanded = expandedId === (exp.id || String(index));
+              const cardId = exp.id || String(index);
+              const isExpanded = expandedId === cardId;
+              const triggerId = `exp-trigger-${cardId}`;
+              const panelId = `exp-panel-${cardId}`;
+              const typeLabel = TYPE_LABELS[exp.type] ?? exp.type;
 
               return (
-                <RevealOnScroll key={exp.id || index} direction="up" delay={index * 0.1}>
+                <RevealOnScroll key={cardId} direction="up" delay={index * 0.1}>
                   <div className="relative pl-12 md:pl-16">
                     {/* Timeline dot */}
                     <div
@@ -70,21 +88,28 @@ export function Experience() {
                     {/* Card */}
                     <motion.div
                       className={cn(
-                        "rounded-2xl cursor-pointer overflow-hidden",
-                        "bg-background-secondary/40 backdrop-blur-sm",
-                        "border border-white/[0.06]",
-                        "hover:border-accent-blue/20",
-                        "transition-all duration-500"
+                        "rounded-2xl overflow-hidden",
+                        "bg-surface-1 backdrop-blur-sm",
+                        "border transition-colors duration-500",
+                        isExpanded ? "border-hairline-strong" : "border-hairline hover:border-hairline-strong"
                       )}
-                      onClick={() => setExpandedId(isExpanded ? null : (exp.id || String(index)))}
-                      whileHover={{
-                        boxShadow: "0 0 30px rgba(59, 130, 246, 0.08)",
-                      }}
+                      whileHover={{ boxShadow: "0 0 30px rgba(59, 130, 246, 0.08)" }}
                       layout
                     >
-                      <div className="p-6">
+                      {/* Accessible disclosure trigger — the whole summary is a
+                          real <button>, so it's keyboard-operable (Enter/Space)
+                          and exposes aria-expanded/aria-controls. */}
+                      <button
+                        type="button"
+                        id={triggerId}
+                        aria-expanded={isExpanded ? "true" : "false"}
+                        aria-controls={panelId}
+                        aria-label={`${exp.role} at ${exp.company}, ${typeLabel}. ${isExpanded ? "Collapse" : "Expand"} details`}
+                        onClick={() => setExpandedId(isExpanded ? null : cardId)}
+                        className="w-full text-left p-6 cursor-pointer rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-blue/50"
+                      >
                         {/* Type Badge + Toggle */}
-                        <div className="flex items-center justify-between mb-3">
+                        <span className="mb-3 flex items-center justify-between">
                           <span
                             className={cn(
                               "px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
@@ -93,37 +118,26 @@ export function Experience() {
                                 : "bg-accent-purple/15 text-accent-purple border border-accent-purple/20"
                             )}
                           >
-                            {exp.type === "fulltime" ? "Full Time" : "Internship"}
+                            {typeLabel}
                           </span>
-                          <motion.div
+                          <motion.span
+                            className="text-text-muted"
                             animate={{ rotate: isExpanded ? 180 : 0 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
+                            aria-hidden
                           >
-                            <ChevronDown size={16} className="text-text-muted" />
-                          </motion.div>
-                        </div>
+                            <ChevronDown size={16} />
+                          </motion.span>
+                        </span>
 
                         {/* Role & Company */}
-                        <h3 className="font-display font-bold text-lg text-text-primary mb-1">
+                        <span className="mb-1 block font-display text-lg font-bold text-text-primary">
                           {exp.role}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-text-secondary mb-3">
+                        </span>
+                        <span className="mb-3 flex flex-wrap items-center gap-3 text-sm text-text-secondary">
                           <span className="flex items-center gap-1.5">
                             <Briefcase size={13} className="text-accent-blue" />
-                            {exp.companyUrl ? (
-                              <a
-                                href={exp.companyUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:text-accent-blue transition-colors"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {exp.company}
-                                <ExternalLink size={10} className="inline ml-1" />
-                              </a>
-                            ) : (
-                              exp.company
-                            )}
+                            {exp.company}
                           </span>
                           <span className="flex items-center gap-1.5">
                             <MapPin size={13} className="text-text-muted" />
@@ -133,23 +147,29 @@ export function Experience() {
                             <Calendar size={13} className="text-text-muted" />
                             {formatDateRange(exp.startDate, exp.endDate)}
                           </span>
-                        </div>
+                        </span>
 
-                        <p className="text-sm text-text-muted leading-relaxed">
+                        <span className="block text-sm leading-relaxed text-text-muted">
                           {exp.description}
-                        </p>
+                        </span>
+                      </button>
 
-                        {/* Expanded Content */}
-                        <AnimatePresence>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            >
+                      {/* Expanded panel */}
+                      <AnimatePresence initial={false}>
+                        {isExpanded && (
+                          <motion.div
+                            id={panelId}
+                            role="region"
+                            aria-labelledby={triggerId}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: EASE_OUT_EXPO }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-6 pb-6">
                               {/* Achievements */}
-                              <div className="mt-4 pt-4 border-t border-white/[0.04]">
+                              <div className="border-t border-hairline pt-4">
                                 <h4 className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-3">
                                   Key Achievements
                                 </h4>
@@ -159,7 +179,7 @@ export function Experience() {
                                       key={i}
                                       className="text-sm text-text-muted flex items-start gap-2"
                                     >
-                                      <span className="mt-1.5 w-1 h-1 rounded-full bg-accent-blue flex-shrink-0" aria-hidden />
+                                      <span className="mt-1.5 w-1 h-1 rounded-full bg-accent-blue shrink-0" aria-hidden />
                                       {achievement}
                                     </li>
                                   ))}
@@ -173,19 +193,30 @@ export function Experience() {
                                 </h4>
                                 <div className="flex flex-wrap gap-1.5">
                                   {exp.technologies.map((tech) => (
-                                    <span
-                                      key={tech}
-                                      className="px-2.5 py-1 text-[11px] rounded-md bg-white/[0.04] text-text-muted border border-white/[0.04]"
-                                    >
+                                    <Badge key={tech} size="sm">
                                       {tech}
-                                    </span>
+                                    </Badge>
                                   ))}
                                 </div>
                               </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
+
+                              {/* Company link — moved out of the trigger button
+                                  so we never nest an <a> inside a <button>. */}
+                              {exp.companyUrl && (
+                                <a
+                                  href={exp.companyUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent-blue hover:underline"
+                                >
+                                  Visit website
+                                  <ExternalLink size={13} />
+                                </a>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </motion.div>
                   </div>
                 </RevealOnScroll>

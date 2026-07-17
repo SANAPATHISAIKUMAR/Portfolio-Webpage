@@ -3,6 +3,9 @@
 import { Award, Calendar, Users, Code2 } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
 import { GlowCard } from "../effects/GlowCard";
+import { SectionHeading } from "../ui/SectionHeading";
+import { StatCard } from "../ui/StatCard";
+import { Badge } from "../ui/Badge";
 import { hackathons } from "../../data/hackathons";
 
 const achievementColors: Record<string, string> = {
@@ -15,7 +18,11 @@ const achievementColors: Record<string, string> = {
 
 export function Hackathons() {
   return (
-    <section id="hackathons" className="relative section-padding overflow-hidden">
+    <section
+      id="hackathons"
+      aria-labelledby="hackathons-heading"
+      className="relative section-padding overflow-hidden"
+    >
       {/* Background */}
       <div
         className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none"
@@ -28,18 +35,16 @@ export function Hackathons() {
       <div className="section-container">
         {/* Header */}
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-yellow-400 mb-3 block">
-              Hackathons
-            </span>
-            <h2 className="font-display text-section-title font-bold text-text-primary mb-4">
-              Building Under{" "}
-              <span className="gradient-text">Pressure</span>
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-section-subtitle">
-              Competing, collaborating, and creating — one hackathon at a time.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="Hackathons"
+            title={
+              <>
+                Building Under <span className="gradient-text">Pressure</span>
+              </>
+            }
+            subtitle="Competing, collaborating, and creating — one hackathon at a time."
+            headingId="hackathons-heading"
+          />
         </RevealOnScroll>
 
         {/* Stats Row */}
@@ -50,18 +55,13 @@ export function Hackathons() {
               { label: "Best Rank", value: "Top 800", icon: Code2 },
               { label: "Teams Led", value: "3x", icon: Users },
             ].map((stat) => (
-              <div
+              <StatCard
                 key={stat.label}
-                className="text-center p-4 rounded-2xl bg-background-secondary/30 border border-white/[0.04] hover:border-yellow-400/20 transition-all duration-300"
-              >
-                <stat.icon size={18} className="mx-auto mb-2 text-yellow-400" />
-                <div className="text-xl font-display font-bold text-text-primary">
-                  {stat.value}
-                </div>
-                <div className="text-[10px] text-text-muted uppercase tracking-wider">
-                  {stat.label}
-                </div>
-              </div>
+                icon={stat.icon}
+                value={stat.value}
+                label={stat.label}
+                valueClassName="text-xl"
+              />
             ))}
           </div>
         </RevealOnScroll>
@@ -137,12 +137,9 @@ export function Hackathons() {
 
                       <div className="flex flex-wrap gap-1.5">
                         {hackathon.technologies.map((tech) => (
-                          <span
-                            key={tech}
-                            className="px-2 py-0.5 text-[10px] rounded-md bg-white/[0.04] text-text-muted border border-white/[0.04]"
-                          >
+                          <Badge key={tech} size="sm">
                             {tech}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     </div>

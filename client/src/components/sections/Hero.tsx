@@ -113,8 +113,7 @@ export function Hero() {
           {/* Headline */}
           <motion.h1
             variants={itemVariants}
-            className="mx-auto mb-5 max-w-3xl font-display font-bold tracking-tight text-text-primary"
-            style={{ fontSize: "clamp(2.25rem, 5vw, 4rem)", lineHeight: 1.05 }}
+            className="mx-auto mb-5 max-w-3xl font-display text-hero-xl font-bold text-text-primary"
           >
             Building scalable,{" "}
             <br className="hidden sm:block" />
@@ -124,7 +123,7 @@ export function Hero() {
           {/* Name + rotating role */}
           <motion.div variants={itemVariants} className="mb-4">
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-text-secondary md:text-xl">
-              Hi, I'm{" "}
+              Hi, I&apos;m{" "}
               <span className="font-semibold text-text-primary">{siteConfig.name}</span>{" "}
               —{" "}
               <span className="font-medium text-accent-blue">

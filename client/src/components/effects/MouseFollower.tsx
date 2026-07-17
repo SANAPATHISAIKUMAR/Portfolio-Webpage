@@ -20,47 +20,47 @@ export function MouseFollower() {
   useEffect(() => {
     if (disabled) return;
 
+    const INTERACTIVE = "a, button, [role='button'], input, textarea, select, [data-cursor-hover]";
+
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
     };
 
-    const handleHoverStart = () => {
-      isHovering.current = true;
-      if (dotRef.current) {
+    const setHover = (hovering: boolean) => {
+      isHovering.current = hovering;
+      if (!dotRef.current) return;
+      if (hovering) {
         dotRef.current.style.transform = "translate(-50%, -50%) scale(2.5)";
         dotRef.current.style.background = "rgba(59, 130, 246, 0.15)";
         dotRef.current.style.border = "1px solid rgba(59, 130, 246, 0.4)";
-      }
-    };
-
-    const handleHoverEnd = () => {
-      isHovering.current = false;
-      if (dotRef.current) {
+      } else {
         dotRef.current.style.transform = "translate(-50%, -50%) scale(1)";
         dotRef.current.style.background = "transparent";
         dotRef.current.style.border = "1.5px solid rgba(248, 250, 252, 0.5)";
       }
     };
 
+    // Event delegation on document (mouseover/mouseout bubble, unlike
+    // mouseenter/leave) — two listeners total instead of one per element, and
+    // it automatically covers nodes mounted later (modals, mobile menu).
+    const onOver = (e: MouseEvent) => {
+      if ((e.target as Element)?.closest?.(INTERACTIVE)) setHover(true);
+    };
+    const onOut = (e: MouseEvent) => {
+      const from = (e.target as Element)?.closest?.(INTERACTIVE);
+      const to = (e.relatedTarget as Element | null)?.closest?.(INTERACTIVE);
+      if (from && from !== to) setHover(false);
+    };
+
     window.addEventListener("mousemove", moveCursor, { passive: true });
-
-    // Add hover detection for interactive elements
-    const interactiveElements = document.querySelectorAll(
-      "a, button, [role='button'], input, textarea, select, [data-cursor-hover]"
-    );
-
-    interactiveElements.forEach((el) => {
-      el.addEventListener("mouseenter", handleHoverStart);
-      el.addEventListener("mouseleave", handleHoverEnd);
-    });
+    document.addEventListener("mouseover", onOver);
+    document.addEventListener("mouseout", onOut);
 
     return () => {
       window.removeEventListener("mousemove", moveCursor);
-      interactiveElements.forEach((el) => {
-        el.removeEventListener("mouseenter", handleHoverStart);
-        el.removeEventListener("mouseleave", handleHoverEnd);
-      });
+      document.removeEventListener("mouseover", onOver);
+      document.removeEventListener("mouseout", onOut);
     };
   }, [disabled, cursorX, cursorY]);
 

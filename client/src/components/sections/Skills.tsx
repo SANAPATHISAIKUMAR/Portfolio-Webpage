@@ -1,36 +1,43 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Search, X } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
+import { SectionHeading } from "../ui/SectionHeading";
+import { Badge } from "../ui/Badge";
 import { cn } from "../../lib/utils";
-import type { SkillCategory } from "../../types";
-import { skills, skillCategories } from "../../data/skills";
+import { EASE_OUT_EXPO } from "../../lib/motion";
+import { skillGroups } from "../../data/skills";
 
 export function Skills() {
-  const [activeCategory, setActiveCategory] = useState<SkillCategory>("frontend");
+  const [query, setQuery] = useState("");
 
-  const filteredSkills = skills.filter((s) => s.category === activeCategory);
-  const activeConfig = skillCategories.find((c) => c.id === activeCategory);
+  const normalizedQuery = query.trim().toLowerCase();
 
-  const polygonPoints = skillCategories
-    .map((cat, index) => {
-      const angle = (index * 360) / skillCategories.length - 90;
-      const radian = (angle * Math.PI) / 180;
-      const catSkills = skills.filter((s) => s.category === cat.id);
-      const avgProficiency =
-        catSkills.length > 0
-          ? catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length
-          : 0;
-      const r = (avgProficiency / 100) * 36;
-      const x = 50 + r * Math.cos(radian);
-      const y = 50 + r * Math.sin(radian);
-      return `${x},${y}`;
-    })
-    .join(" ");
+  // Filter skills within each group by the search query, dropping groups that
+  // have no matching skills. An empty query shows everything.
+  const visibleGroups = useMemo(() => {
+    if (!normalizedQuery) return skillGroups;
+    return skillGroups
+      .map((group) => {
+        const labelMatches = group.label.toLowerCase().includes(normalizedQuery);
+        const skills = labelMatches
+          ? group.skills
+          : group.skills.filter((s) => s.toLowerCase().includes(normalizedQuery));
+        return { ...group, skills };
+      })
+      .filter((group) => group.skills.length > 0);
+  }, [normalizedQuery]);
+
+  const totalMatches = visibleGroups.reduce((sum, g) => sum + g.skills.length, 0);
 
   return (
-    <section id="skills" className="relative section-padding overflow-hidden">
+    <section
+      id="skills"
+      aria-labelledby="skills-heading"
+      className="relative section-padding overflow-hidden"
+    >
       {/* Background */}
       <div className="absolute inset-0 dot-pattern opacity-20" />
       <div
@@ -41,251 +48,143 @@ export function Skills() {
         }}
       />
 
-      <div className="section-container">
+      <div className="section-container relative">
         {/* Section Header */}
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-accent-purple mb-3 block">
-              Skills & Technologies
-            </span>
-            <h2 className="font-display text-section-title font-bold text-text-primary mb-4">
-              Tech{" "}
-              <span className="gradient-text">Arsenal</span>
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-section-subtitle">
-              The tools and technologies I use to bring ideas to life.
+          <SectionHeading
+            eyebrow="Skills & Technologies"
+            title={
+              <>
+                Tech <span className="gradient-text">Arsenal</span>
+              </>
+            }
+            subtitle="The tools and technologies I use to bring ideas to life."
+            headingId="skills-heading"
+          />
+        </RevealOnScroll>
+
+        {/* Search */}
+        <RevealOnScroll>
+          <div className="mx-auto mb-10 max-w-md">
+            <div className="relative">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
+                aria-hidden
+              />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search skills — React, AWS, Docker…"
+                aria-label="Search skills"
+                className={cn(
+                  "w-full rounded-xl border border-hairline bg-surface-1 py-3 pl-11 pr-10",
+                  "text-sm text-text-primary placeholder:text-text-muted backdrop-blur-sm",
+                  "focus:border-accent-blue/40 focus:outline-none focus:ring-1 focus:ring-accent-blue/20",
+                  "transition-colors duration-300"
+                )}
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-text-muted hover:text-text-primary transition-colors"
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+            <p className="mt-2 text-center text-caption text-text-muted" aria-live="polite">
+              {normalizedQuery
+                ? `${totalMatches} skill${totalMatches === 1 ? "" : "s"} across ${visibleGroups.length} categor${visibleGroups.length === 1 ? "y" : "ies"}`
+                : " "}
             </p>
           </div>
         </RevealOnScroll>
 
-        {/* Category Tabs */}
-        <RevealOnScroll>
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-12 px-2">
-            {skillCategories.map((cat) => {
-              const isActive = activeCategory === cat.id;
+        {/* Category Cards */}
+        {visibleGroups.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleGroups.map((group, index) => {
+              const Icon = group.icon;
               return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id as SkillCategory)}
+                <motion.div
+                  key={group.id}
+                  layout
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{
+                    duration: 0.5,
+                    delay: Math.min(index * 0.06, 0.3),
+                    ease: EASE_OUT_EXPO,
+                  }}
                   className={cn(
-                    "relative px-4 py-2 rounded-xl text-sm font-medium",
-                    "transition-all duration-300 whitespace-nowrap",
-                    isActive
-                      ? "text-text-primary"
-                      : "text-text-muted hover:text-text-secondary"
+                    "group flex h-full flex-col rounded-2xl p-6",
+                    "border border-hairline bg-surface-1 backdrop-blur-sm",
+                    "transition-colors duration-500 hover:border-hairline-strong"
                   )}
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeSkillTab"
-                      className="absolute inset-0 rounded-xl"
-                      style={{
-                        background: `${(cat as { color: string }).color}15`,
-                        border: `1px solid ${(cat as { color: string }).color}30`,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 350,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  <span className="relative z-10 flex items-center gap-2">
-                    <span>{cat.icon}</span>
-                    {cat.label}
-                  </span>
-                </button>
+                  {/* Header */}
+                  <div className="mb-4 flex items-center gap-3">
+                    <span
+                      className={cn(
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                        "bg-accent-blue/10 text-accent-blue",
+                        "transition-transform duration-500 group-hover:scale-105"
+                      )}
+                      aria-hidden
+                    >
+                      <Icon size={18} />
+                    </span>
+                    <div>
+                      <h3 className="font-display text-base font-semibold text-text-primary">
+                        {group.label}
+                      </h3>
+                      <p className="text-caption text-text-muted">
+                        {group.skills.length} skills
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+                    {group.description}
+                  </p>
+
+                  {/* Skill chips */}
+                  <div className="mt-auto flex flex-wrap gap-1.5">
+                    {group.skills.map((skill) => (
+                      <Badge key={skill} size="sm">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </motion.div>
               );
             })}
           </div>
-        </RevealOnScroll>
-
-        {/* Skills Grid */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {filteredSkills.map((skill, index) => (
-              <motion.div
-                key={skill.name}
-                className={cn(
-                  "group relative p-5 rounded-2xl",
-                  "bg-background-secondary/40 backdrop-blur-sm",
-                  "border border-white/[0.04]",
-                  "hover:border-white/[0.12]",
-                  "transition-all duration-500"
-                )}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: index * 0.05,
-                  duration: 0.5,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                whileHover={{
-                  y: -4,
-                  transition: { duration: 0.3 },
-                }}
-                style={{ boxShadow: "none" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = `0 0 30px ${(activeConfig as { color: string } | undefined)?.color}15`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                {/* Skill Icon */}
-                <div className="text-2xl mb-3">{skill.icon}</div>
-
-                {/* Skill Name */}
-                <h3 className="font-medium text-sm text-text-primary mb-3">
-                  {skill.name}
-                </h3>
-
-                {/* Progress Bar */}
-                <div className="relative h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                  <motion.div
-                    className="absolute inset-y-0 left-0 rounded-full"
-                    style={{
-                      background: `linear-gradient(90deg, ${(activeConfig as { color: string } | undefined)?.color ?? "#3B82F6"}, ${(activeConfig as { color: string } | undefined)?.color ?? "#3B82F6"}80)`,
-                    }}
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${skill.proficiency}%` }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 1,
-                      delay: index * 0.05 + 0.3,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                  />
-                </div>
-
-                {/* Proficiency Label */}
-                <span className="text-[10px] text-text-muted mt-2 block">
-                  {skill.proficiency}%
-                </span>
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Radar Chart Visual */}
-        <RevealOnScroll>
-          <div className="mt-12 flex justify-center">
-            <div className="relative w-full max-w-[360px] aspect-square mx-auto">
-              {/* Radar background circles */}
-              {[100, 80, 60, 40, 20].map((size) => (
-                <div
-                  key={size}
-                  className="absolute rounded-full border border-white/[0.05]"
-                  style={{
-                    width: `${size}%`,
-                    height: `${size}%`,
-                    top: `${(100 - size) / 2}%`,
-                    left: `${(100 - size) / 2}%`,
-                  }}
-                />
-              ))}
-
-              {/* Dynamic SVG Radar Chart */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
-                <defs>
-                  <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor={(activeConfig as { color: string } | undefined)?.color ?? "#3B82F6"} stopOpacity="0.05" />
-                    <stop offset="100%" stopColor={(activeConfig as { color: string } | undefined)?.color ?? "#7C3AED"} stopOpacity="0.35" />
-                  </radialGradient>
-                </defs>
-                {/* Radial grid lines */}
-                {skillCategories.map((_, index) => {
-                  const angle = (index * 360) / skillCategories.length - 90;
-                  const radian = (angle * Math.PI) / 180;
-                  const px = 50 + 40 * Math.cos(radian);
-                  const py = 50 + 40 * Math.sin(radian);
-                  return (
-                    <line
-                      key={index}
-                      x1="50"
-                      y1="50"
-                      x2={px}
-                      y2={py}
-                      className="stroke-white/[0.05] stroke-[0.25]"
-                    />
-                  );
-                })}
-                {/* Filled Radar area */}
-                <motion.polygon
-                  points={polygonPoints}
-                  fill="url(#radarGradient)"
-                  className="stroke-[0.5] transition-all duration-700"
-                  style={{ stroke: (activeConfig as { color: string } | undefined)?.color ?? "#3B82F6" }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                />
-              </svg>
-
-              {/* Category labels around the radar */}
-              {skillCategories.map((cat, index) => {
-                const angle = (index * 360) / skillCategories.length - 90;
-                const radian = (angle * Math.PI) / 180;
-                // Use 40% radius clamped to keep labels inside
-                const x = 50 + 40 * Math.cos(radian);
-                const y = 50 + 40 * Math.sin(radian);
-
-                const catSkills = skills.filter((s) => s.category === cat.id);
-                const avgProficiency =
-                  catSkills.length > 0
-                    ? catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length
-                    : 0;
-
-                return (
-                  <motion.div
-                    key={cat.id}
-                    className="absolute flex flex-col items-center gap-0.5"
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                  >
-                    <button
-                      onClick={() => setActiveCategory(cat.id as SkillCategory)}
-                      className={cn(
-                        "w-9 h-9 rounded-xl flex items-center justify-center text-sm",
-                        "transition-all duration-300 cursor-pointer",
-                        activeCategory === cat.id
-                          ? "scale-110"
-                          : "hover:scale-105"
-                      )}
-                      style={{
-                        background: `${(cat as { color: string }).color}20`,
-                        border: `1px solid ${(cat as { color: string }).color}40`,
-                        boxShadow:
-                          activeCategory === cat.id
-                            ? `0 0 16px ${(cat as { color: string }).color}30`
-                            : "none",
-                      }}
-                      title={`${cat.label}: ${Math.round(avgProficiency)}%`}
-                    >
-                      {cat.icon}
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </div>
+        ) : (
+          <div className="mx-auto max-w-md rounded-2xl border border-hairline bg-surface-1 p-10 text-center">
+            <p className="text-sm text-text-secondary">
+              No skills match{" "}
+              <span className="font-medium text-text-primary">
+                &ldquo;{query.trim()}&rdquo;
+              </span>
+              .
+            </p>
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="mt-4 text-sm font-medium text-accent-blue hover:underline"
+            >
+              Clear search
+            </button>
           </div>
-        </RevealOnScroll>
+        )}
       </div>
     </section>
   );
 }
-

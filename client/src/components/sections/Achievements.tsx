@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
 import { CounterAnimation } from "../effects/CounterAnimation";
+import { SectionHeading } from "../ui/SectionHeading";
 import { cn } from "../../lib/utils";
 import { achievements } from "../../data/achievements";
 
@@ -38,7 +39,11 @@ function parseValue(val: string) {
 
 export function Achievements() {
   return (
-    <section id="achievements" className="relative section-padding overflow-hidden">
+    <section
+      id="achievements"
+      aria-labelledby="achievements-heading"
+      className="relative section-padding overflow-hidden"
+    >
       {/* Background blob */}
       <div
         className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none"
@@ -51,18 +56,16 @@ export function Achievements() {
       <div className="section-container">
         {/* Header */}
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-yellow-400 mb-3 block">
-              Achievements
-            </span>
-            <h2 className="font-display text-section-title font-bold text-text-primary mb-4">
-              Numbers That{" "}
-              <span className="gradient-text">Speak</span>
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-section-subtitle">
-              Milestones and accomplishments along the journey.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="Achievements"
+            title={
+              <>
+                Numbers That <span className="gradient-text">Speak</span>
+              </>
+            }
+            subtitle="Milestones and accomplishments along the journey."
+            headingId="achievements-heading"
+          />
         </RevealOnScroll>
 
         {/* Achievement Grid */}
@@ -74,8 +77,8 @@ export function Achievements() {
                   "relative p-6 rounded-2xl text-center",
                   "bg-gradient-to-br",
                   categoryGradients[achievement.category] || "from-blue-500/10 to-purple-500/10",
-                  "border border-white/[0.06]",
-                  categoryBorder[achievement.category] || "hover:border-white/[0.12]",
+                  "border border-hairline",
+                  categoryBorder[achievement.category] || "hover:border-hairline-strong",
                   "transition-all duration-500",
                   "group"
                 )}

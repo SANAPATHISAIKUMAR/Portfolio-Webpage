@@ -42,11 +42,15 @@ const config: Config = {
         mono: ["JetBrains Mono", "Fira Code", "monospace"],
       },
       fontSize: {
-        "hero-xl": ["clamp(3rem, 8vw, 6rem)", { lineHeight: "1.05", letterSpacing: "-0.03em" }],
-        "hero-lg": ["clamp(2.5rem, 6vw, 4.5rem)", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
-        "hero-md": ["clamp(2rem, 4vw, 3rem)", { lineHeight: "1.15", letterSpacing: "-0.02em" }],
-        "section-title": ["clamp(1.75rem, 3.5vw, 2.5rem)", { lineHeight: "1.2", letterSpacing: "-0.02em" }],
-        "section-subtitle": ["clamp(1rem, 2vw, 1.25rem)", { lineHeight: "1.6" }],
+        // Unified fluid type scale. Desktop caps match the design spec:
+        // hero 72px · section title 48px · subtitle 22px · body 18px · caption 14px.
+        "hero-xl": ["clamp(2.75rem, 6vw, 4.5rem)", { lineHeight: "1.05", letterSpacing: "-0.03em" }],
+        "hero-lg": ["clamp(2.25rem, 5vw, 3.5rem)", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+        "hero-md": ["clamp(1.75rem, 4vw, 2.75rem)", { lineHeight: "1.15", letterSpacing: "-0.02em" }],
+        "section-title": ["clamp(2rem, 4vw, 3rem)", { lineHeight: "1.15", letterSpacing: "-0.02em" }],
+        "section-subtitle": ["clamp(1.0625rem, 1.6vw, 1.375rem)", { lineHeight: "1.6" }],
+        "body-lg": ["1.125rem", { lineHeight: "1.7" }],
+        "caption": ["0.875rem", { lineHeight: "1.5" }],
       },
       spacing: {
         "section": "clamp(80px, 12vw, 160px)",

@@ -1,63 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle, AlertCircle, Mail, MapPin } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Send, CheckCircle, AlertCircle, Mail, MapPin, Copy, Check } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
-
+import { SectionHeading } from "../ui/SectionHeading";
 import { GradientBlobs } from "../effects/GradientBlobs";
 import { GithubIcon, LinkedinIcon } from "../ui/SocialIcons";
 import { siteConfig } from "../../config/site";
 import { cn } from "../../lib/utils";
-import type { ContactFormData } from "../../types";
+import { contactSchema, type ContactFormValues } from "../../lib/validations";
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
 export function Contact() {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
   const [status, setStatus] = useState<FormStatus>("idle");
-  const [errors, setErrors] = useState<Partial<ContactFormData>>({});
+  const [copied, setCopied] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
-  const validate = (): boolean => {
-    const newErrors: Partial<ContactFormData> = {};
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    mode: "onBlur",
+  });
 
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Invalid email address";
-    }
-    if (!formData.subject.trim()) newErrors.subject = "Subject is required";
-    if (!formData.message.trim()) {
-      newErrors.message = "Message is required";
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = "Message must be at least 10 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+  const onSubmit = async (data: ContactFormValues) => {
     setStatus("submitting");
 
     const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY as string | undefined;
 
-    // Graceful fallback: if no serverless email key is configured, open the
+    // Graceful fallback: with no serverless email key configured, open the
     // visitor's mail client with the message pre-filled instead of failing.
     if (!accessKey) {
       const body = encodeURIComponent(
-        `${formData.message}\n\n— ${formData.name} (${formData.email})`
+        `${data.message}\n\n— ${data.name} (${data.email})`
       );
-      const subject = encodeURIComponent(formData.subject);
+      const subject = encodeURIComponent(data.subject);
       window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
       setStatus("idle");
       return;
@@ -66,16 +50,13 @@ export function Contact() {
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           access_key: accessKey,
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
+          name: data.name,
+          email: data.email,
+          subject: data.subject,
+          message: data.message,
           from_name: "Portfolio Contact Form",
         }),
       });
@@ -86,7 +67,7 @@ export function Contact() {
       }
 
       setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      reset();
       setTimeout(() => setStatus("idle"), 5000);
     } catch {
       setStatus("error");
@@ -94,44 +75,48 @@ export function Contact() {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name as keyof ContactFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(siteConfig.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable (e.g. insecure context) — silently ignore.
     }
   };
 
   const inputClasses = cn(
     "w-full px-4 py-3 rounded-xl",
-    "bg-background-secondary/60 backdrop-blur-sm",
-    "border border-white/[0.06]",
+    "bg-surface-1 backdrop-blur-sm",
+    "border border-hairline",
     "text-text-primary text-sm placeholder:text-text-muted",
     "focus:outline-none focus:border-accent-blue/40 focus:ring-1 focus:ring-accent-blue/20",
-    "transition-all duration-300"
+    "transition-colors duration-300"
   );
 
+  const labelClasses = "mb-1.5 block text-caption font-medium text-text-secondary";
+
   return (
-    <section id="contact" className="relative section-padding overflow-hidden">
+    <section
+      id="contact"
+      aria-labelledby="contact-heading"
+      className="relative section-padding overflow-hidden"
+    >
       <GradientBlobs className="opacity-30" />
 
       <div className="section-container">
         {/* Header */}
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-accent-blue mb-3 block">
-              Get in Touch
-            </span>
-            <h2 className="font-display text-section-title font-bold text-text-primary mb-4">
-              Let's Build{" "}
-              <span className="gradient-text">Together</span>
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto text-section-subtitle">
-              Have a project in mind? I'd love to hear about it.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="Get in Touch"
+            title={
+              <>
+                Let&apos;s Build <span className="gradient-text">Together</span>
+              </>
+            }
+            subtitle="Have a project in mind? I'd love to hear about it."
+            headingId="contact-heading"
+          />
         </RevealOnScroll>
 
         <div className="max-w-4xl mx-auto grid md:grid-cols-5 gap-8 lg:gap-12">
@@ -149,21 +134,38 @@ export function Contact() {
               </div>
 
               <div className="space-y-4">
-                <a
-                  href={`mailto:${siteConfig.email}`}
-                  className="flex items-center gap-3 group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-accent-blue/10 border border-accent-blue/20 flex items-center justify-center group-hover:bg-accent-blue/20 transition-colors">
-                    <Mail size={16} className="text-accent-blue" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-muted">Email</p>
-                    <p className="text-sm text-text-primary">{siteConfig.email}</p>
-                  </div>
-                </a>
+                {/* Email + copy */}
+                <div className="flex items-center gap-3">
+                  <a
+                    href={`mailto:${siteConfig.email}`}
+                    className="flex items-center gap-3 group min-w-0"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-accent-blue/10 border border-accent-blue/20 flex items-center justify-center group-hover:bg-accent-blue/20 transition-colors shrink-0">
+                      <Mail size={16} className="text-accent-blue" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs text-text-muted">Email</p>
+                      <p className="text-sm text-text-primary truncate">
+                        {siteConfig.email}
+                      </p>
+                    </div>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={copyEmail}
+                    aria-label={copied ? "Email copied" : "Copy email address"}
+                    className="shrink-0 rounded-lg border border-hairline bg-surface-1 p-2 text-text-muted hover:text-text-primary hover:border-hairline-strong transition-colors"
+                  >
+                    {copied ? (
+                      <Check size={15} className="text-green-400" />
+                    ) : (
+                      <Copy size={15} />
+                    )}
+                  </button>
+                </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
                     <MapPin size={16} className="text-accent-purple" />
                   </div>
                   <div>
@@ -187,7 +189,7 @@ export function Contact() {
                       rel={link.platform !== "Email" ? "noopener noreferrer" : undefined}
                       className={cn(
                         "w-10 h-10 rounded-xl flex items-center justify-center",
-                        "bg-white/[0.04] border border-white/[0.06]",
+                        "bg-surface-1 border border-hairline",
                         "text-text-muted hover:text-text-primary",
                         "hover:border-accent-blue/20 hover:bg-accent-blue/10",
                         "transition-all duration-300"
@@ -211,82 +213,118 @@ export function Contact() {
           {/* Form — Right */}
           <RevealOnScroll direction="right" className="md:col-span-3">
             <form
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
               className={cn(
                 "p-6 md:p-8 rounded-2xl",
-                "bg-background-secondary/30 backdrop-blur-sm",
-                "border border-white/[0.06]"
+                "bg-surface-1 backdrop-blur-sm",
+                "border border-hairline"
               )}
             >
               <div className="space-y-4">
                 {/* Name */}
                 <div>
+                  <label htmlFor="contact-name" className={labelClasses}>
+                    Name
+                  </label>
                   <input
+                    id="contact-name"
                     type="text"
-                    name="name"
-                    placeholder="Your Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={cn(inputClasses, errors.name && "border-red-500/50")}
+                    autoComplete="name"
+                    placeholder="Your name"
+                    aria-invalid={errors.name ? "true" : "false"}
+                    aria-describedby={errors.name ? "contact-name-error" : undefined}
+                    className={cn(inputClasses, errors.name && "border-red-500/60")}
+                    {...register("name")}
                   />
                   {errors.name && (
-                    <p className="text-red-400 text-xs mt-1">{errors.name}</p>
+                    <p
+                      id="contact-name-error"
+                      role="alert"
+                      className="text-red-400 text-xs mt-1"
+                    >
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
                 {/* Email */}
                 <div>
+                  <label htmlFor="contact-email" className={labelClasses}>
+                    Email
+                  </label>
                   <input
+                    id="contact-email"
                     type="email"
-                    name="email"
-                    placeholder="Your Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={cn(inputClasses, errors.email && "border-red-500/50")}
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    aria-invalid={errors.email ? "true" : "false"}
+                    aria-describedby={errors.email ? "contact-email-error" : undefined}
+                    className={cn(inputClasses, errors.email && "border-red-500/60")}
+                    {...register("email")}
                   />
                   {errors.email && (
-                    <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+                    <p
+                      id="contact-email-error"
+                      role="alert"
+                      className="text-red-400 text-xs mt-1"
+                    >
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
 
                 {/* Subject */}
                 <div>
+                  <label htmlFor="contact-subject" className={labelClasses}>
+                    Subject
+                  </label>
                   <input
+                    id="contact-subject"
                     type="text"
-                    name="subject"
-                    placeholder="Subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className={cn(
-                      inputClasses,
-                      errors.subject && "border-red-500/50"
-                    )}
+                    placeholder="What's this about?"
+                    aria-invalid={errors.subject ? "true" : "false"}
+                    aria-describedby={errors.subject ? "contact-subject-error" : undefined}
+                    className={cn(inputClasses, errors.subject && "border-red-500/60")}
+                    {...register("subject")}
                   />
                   {errors.subject && (
-                    <p className="text-red-400 text-xs mt-1">{errors.subject}</p>
+                    <p
+                      id="contact-subject-error"
+                      role="alert"
+                      className="text-red-400 text-xs mt-1"
+                    >
+                      {errors.subject.message}
+                    </p>
                   )}
                 </div>
 
                 {/* Message */}
                 <div>
+                  <label htmlFor="contact-message" className={labelClasses}>
+                    Message
+                  </label>
                   <textarea
-                    name="message"
-                    placeholder="Your Message"
+                    id="contact-message"
                     rows={5}
-                    value={formData.message}
-                    onChange={handleChange}
-                    className={cn(
-                      inputClasses,
-                      "resize-none",
-                      errors.message && "border-red-500/50"
-                    )}
+                    placeholder="Tell me a little about it…"
+                    aria-invalid={errors.message ? "true" : "false"}
+                    aria-describedby={errors.message ? "contact-message-error" : undefined}
+                    className={cn(inputClasses, "resize-none", errors.message && "border-red-500/60")}
+                    {...register("message")}
                   />
                   {errors.message && (
-                    <p className="text-red-400 text-xs mt-1">{errors.message}</p>
+                    <p
+                      id="contact-message-error"
+                      role="alert"
+                      className="text-red-400 text-xs mt-1"
+                    >
+                      {errors.message.message}
+                    </p>
                   )}
                 </div>
 
-                {/* Submit */}
+                {/* Submit / status */}
                 <AnimatePresence mode="wait">
                   {status === "success" ? (
                     <motion.div
@@ -294,11 +332,12 @@ export function Contact() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
+                      role="status"
                       className="flex items-center gap-2 text-green-400 py-3"
                     >
                       <CheckCircle size={18} />
                       <span className="text-sm">
-                        Message sent! I'll get back to you soon.
+                        Message sent! I&apos;ll get back to you soon.
                       </span>
                     </motion.div>
                   ) : status === "error" ? (
@@ -307,6 +346,7 @@ export function Contact() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
+                      role="alert"
                       className="flex items-center gap-2 text-red-400 py-3"
                     >
                       <AlertCircle size={18} />
@@ -319,20 +359,25 @@ export function Contact() {
                       <button
                         type="submit"
                         disabled={status === "submitting"}
-                        className="w-full relative inline-flex items-center justify-center gap-2 font-medium tracking-tight rounded-xl px-8 py-4 text-lg bg-gradient-to-r from-accent-blue to-accent-purple text-white shadow-glow hover:shadow-glow-lg hover:brightness-110 transition-all duration-300 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/50 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className={cn(
+                          "w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl",
+                          "font-medium tracking-[-0.01em]",
+                          "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)]",
+                          "hover:bg-[var(--btn-primary-bg-hover)]",
+                          "transition-colors duration-200",
+                          "cursor-pointer select-none",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                          "disabled:opacity-60 disabled:cursor-not-allowed"
+                        )}
                       >
                         {status === "submitting" ? (
                           <>
-                            <motion.div
-                              className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                              animate={{ rotate: 360 }}
-                              transition={{
-                                repeat: Infinity,
-                                duration: 0.8,
-                                ease: "linear",
-                              }}
+                            <motion.span
+                              className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full"
+                              animate={prefersReducedMotion ? undefined : { rotate: 360 }}
+                              transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
                             />
-                            Sending...
+                            Sending…
                           </>
                         ) : (
                           <>
@@ -352,4 +397,3 @@ export function Contact() {
     </section>
   );
 }
-

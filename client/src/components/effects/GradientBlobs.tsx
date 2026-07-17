@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "../../lib/utils";
 
 interface GradientBlobsProps {
@@ -8,6 +8,8 @@ interface GradientBlobsProps {
 }
 
 export function GradientBlobs({ className = "" }: GradientBlobsProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)} aria-hidden="true">
       {/* Blue blob */}
@@ -19,11 +21,11 @@ export function GradientBlobs({ className = "" }: GradientBlobsProps) {
           left: "15%",
           filter: "blur(80px)",
         }}
-        animate={{
-          x: [0, 50, -30, 0],
-          y: [0, -40, 30, 0],
-          scale: [1, 1.1, 0.95, 1],
-        }}
+        animate={
+          prefersReducedMotion
+            ? undefined
+            : { x: [0, 50, -30, 0], y: [0, -40, 30, 0], scale: [1, 1.1, 0.95, 1] }
+        }
         transition={{
           duration: 12,
           repeat: Infinity,
@@ -40,11 +42,11 @@ export function GradientBlobs({ className = "" }: GradientBlobsProps) {
           right: "10%",
           filter: "blur(80px)",
         }}
-        animate={{
-          x: [0, -40, 20, 0],
-          y: [0, 30, -50, 0],
-          scale: [1, 0.9, 1.1, 1],
-        }}
+        animate={
+          prefersReducedMotion
+            ? undefined
+            : { x: [0, -40, 20, 0], y: [0, 30, -50, 0], scale: [1, 0.9, 1.1, 1] }
+        }
         transition={{
           duration: 15,
           repeat: Infinity,
@@ -61,11 +63,11 @@ export function GradientBlobs({ className = "" }: GradientBlobsProps) {
           left: "40%",
           filter: "blur(80px)",
         }}
-        animate={{
-          x: [0, 30, -40, 0],
-          y: [0, -30, 20, 0],
-          scale: [1, 1.05, 0.95, 1],
-        }}
+        animate={
+          prefersReducedMotion
+            ? undefined
+            : { x: [0, 30, -40, 0], y: [0, -30, 20, 0], scale: [1, 1.05, 0.95, 1] }
+        }
         transition={{
           duration: 18,
           repeat: Infinity,
