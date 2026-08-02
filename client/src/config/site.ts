@@ -1,12 +1,13 @@
 import type { SiteConfig, NavItem } from "../types";
+import { projects } from "../data/projects";
+import { hackathons } from "../data/hackathons";
+import { experiences } from "../data/experience";
 
 export const siteConfig: SiteConfig = {
   name: "Sanapathi Sai Kumar",
   title: "Sai Kumar — Associate Software Engineer | MERN & Full-Stack Developer",
   description:
     "Associate Software Engineer specializing in MERN-stack development — building scalable full-stack healthcare applications, responsive UIs, REST APIs, and AI-powered solutions, with growing expertise in AWS, cloud computing, and system design.",
-  url: "https://saikumar.dev",
-  ogImage: "/images/og-image.png",
   role: "Associate Software Engineer",
   company: "Lystra Pharma Private Limited",
   availability: "Open to Software Engineer roles",
@@ -34,7 +35,7 @@ export const siteConfig: SiteConfig = {
   ],
   email: "saikranthi1401@gmail.com",
   location: "Visakhapatnam, India",
-  resume: "/resume/SaiKumar_Resume.pdf",
+  resume: "/resume",
 };
 
 export const navigationItems: NavItem[] = [
@@ -55,9 +56,19 @@ export const heroRoles = [
   "AI Integration Engineer",
 ];
 
+/**
+ * Derived from the data files rather than hand-typed — the old hardcoded
+ * "5+ Projects" had already drifted behind the real list, and a portfolio
+ * that miscounts its own work is the worst possible first impression.
+ */
+const distinctTechnologies = new Set(projects.flatMap((p) => p.techStack)).size;
+
 export const heroStats = [
-  { value: "5+", label: "Projects" },
-  { value: "5", label: "Hackathons" },
-  { value: "2", label: "Internships" },
-  { value: "20+", label: "Technologies" },
+  { value: `${projects.length}`, label: "Projects" },
+  { value: `${hackathons.length}`, label: "Hackathons" },
+  {
+    value: `${experiences.filter((e) => e.type === "internship").length}`,
+    label: "Internships",
+  },
+  { value: `${Math.floor(distinctTechnologies / 5) * 5}+`, label: "Technologies" },
 ];

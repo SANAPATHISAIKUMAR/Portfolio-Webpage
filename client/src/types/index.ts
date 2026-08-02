@@ -18,9 +18,16 @@ export interface Project {
   challenges?: string;
   techStack: string[];
   features: string[];
-  image: string;
+  /** Cover screenshot under /public. Cards fall back to a generated gradient. */
+  image?: string;
   screenshots?: string[];
-  githubUrl?: string;
+  /**
+   * Public GitHub repository name (not the full URL). Single source of truth for
+   * both the "Code" link and the live stars/forks/last-push badges — deriving the
+   * URL from this is what stops the two drifting apart. Omit for private or
+   * no-code work.
+   */
+  repo?: string;
   liveUrl?: string;
   featured: boolean;
   category: "fullstack" | "ai" | "frontend" | "backend" | "mobile";
@@ -86,29 +93,6 @@ export interface Achievement {
   icon: string;
 }
 
-export interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  company: string;
-  content: string;
-  avatar?: string;
-  rating?: number;
-}
-
-export interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  coverImage?: string;
-  tags: string[];
-  publishedAt: string;
-  readTime: string;
-  category: string;
-}
-
 export interface Service {
   id: string;
   title: string;
@@ -148,11 +132,10 @@ export interface SiteConfig {
   name: string;
   title: string;
   description: string;
-  url: string;
-  ogImage: string;
   links: SocialLink[];
   email: string;
   location: string;
+  /** Where the "Resume" buttons point. */
   resume: string;
   /** Current job title, e.g. "Associate Software Engineer". */
   role?: string;
@@ -164,36 +147,65 @@ export interface SiteConfig {
   summary?: string;
 }
 
+/**
+ * Shape we keep from the GitHub REST repo payload. Note the nullable fields —
+ * the API genuinely returns `null` for description/language/homepage on repos
+ * that haven't set them, so they must not be typed as plain `string`.
+ */
 export interface GitHubRepo {
   id: number;
   name: string;
   full_name: string;
-  description: string;
+  description: string | null;
   html_url: string;
   homepage: string | null;
   stargazers_count: number;
   forks_count: number;
-  language: string;
+  language: string | null;
   topics: string[];
   updated_at: string;
+  pushed_at: string;
+  /** Repo size in KB — 0 means the repo is empty. */
+  size: number;
+  fork: boolean;
+  archived: boolean;
 }
 
 export interface GitHubUser {
   login: string;
-  name: string;
+  name: string | null;
   avatar_url: string;
   html_url: string;
-  bio: string;
+  bio: string | null;
   public_repos: number;
   followers: number;
   following: number;
 }
 
-export interface ContactFormData {
+/** Live per-repository stats merged into a curated project card. */
+export interface RepoStats {
   name: string;
-  email: string;
-  subject: string;
-  message: string;
+  url: string;
+  stars: number;
+  forks: number;
+  language: string | null;
+  /** ISO timestamp of the last push. */
+  pushedAt: string;
+  /**
+   * Pre-formatted "3 days ago" label. Computed on the server so the client
+   * never re-derives it from the clock and desyncs the hydrated markup.
+   */
+  updatedLabel: string;
+}
+
+/** Aggregated payload returned by the server-side GitHub layer. */
+export interface GitHubData {
+  user: GitHubUser;
+  repos: GitHubRepo[];
+  totalStars: number;
+  languages: { name: string; count: number }[];
+  /** ISO timestamp of when this snapshot was fetched from GitHub. */
+  fetchedAt: string;
 }
 
 export interface TimelineItem {

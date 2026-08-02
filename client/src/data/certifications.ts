@@ -1,39 +1,26 @@
 import type { Certification } from "../types";
 
 /**
- * SCAFFOLD — replace with your real certificates.
- *   1. Update title / issuer / date / skills for each.
- *   2. Drop the certificate image in `public/certificates/` and set `image`.
- *   3. Add the public verification link as `credentialUrl` (or remove it).
- * Delete any entries you don't have — the section hides itself when this array
- * is empty, so it never shows fake or half-finished cards.
+ * Real certifications only.
+ *
+ * This array previously shipped three placeholder cards whose issuer literally
+ * read "Add issuer (e.g. Coursera / Udemy / NPTEL)" — visible to anyone who
+ * loaded the site. Both the Certifications section and the résumé page hide
+ * themselves while this is empty, which is strictly better than displaying
+ * credentials that aren't real.
+ *
+ * To add one:
+ *   {
+ *     id: "genai-guvi",
+ *     title: "Generative AI",
+ *     issuer: "HCL GUVI",
+ *     date: "Mar 2025",
+ *     skills: ["Generative AI", "Prompt Engineering"],
+ *     credentialUrl: "https://…",          // public verification link
+ *     image: "/certificates/genai.png",     // optional, drop file in public/certificates/
+ *   }
+ *
+ * Known from the achievements data but not yet filled in: Generative AI,
+ * JavaScript, and HTML/CSS certificates from HCL GUVI and Microsoft.
  */
-export const certifications: Certification[] = [
-  {
-    id: "cert-fullstack",
-    title: "Full-Stack Web Development",
-    issuer: "Add issuer (e.g. Coursera / Udemy / NPTEL)",
-    date: "2025",
-    skills: ["React", "Node.js", "MongoDB", "Express"],
-    // image: "/certificates/fullstack.png",
-    // credentialUrl: "https://…",
-  },
-  {
-    id: "cert-aws",
-    title: "AWS Cloud Fundamentals",
-    issuer: "Add issuer",
-    date: "2025",
-    skills: ["AWS", "EC2", "S3", "IAM"],
-    // image: "/certificates/aws.png",
-    // credentialUrl: "https://…",
-  },
-  {
-    id: "cert-ml",
-    title: "Machine Learning",
-    issuer: "Add issuer",
-    date: "2024",
-    skills: ["Python", "ML", "Data"],
-    // image: "/certificates/ml.png",
-    // credentialUrl: "https://…",
-  },
-];
+export const certifications: Certification[] = [];

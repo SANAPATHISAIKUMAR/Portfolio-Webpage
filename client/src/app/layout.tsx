@@ -6,6 +6,9 @@ import { Navbar } from "../components/layout/Navbar";
 import { Footer } from "../components/layout/Footer";
 import { themeInitScript } from "../components/providers/ThemeProvider";
 import { siteConfig } from "../config/site";
+import { getSiteUrl } from "../config/site-url";
+
+const siteUrl = getSiteUrl();
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,7 +24,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(siteUrl),
   title: {
     default: siteConfig.title,
     template: `%s — ${siteConfig.name}`,
@@ -41,27 +44,29 @@ export const metadata: Metadata = {
     "TypeScript",
     "MongoDB",
   ],
-  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  authors: [{ name: siteConfig.name, url: siteUrl }],
   creator: siteConfig.name,
-  alternates: { canonical: siteConfig.url },
+  alternates: { canonical: "/" },
   robots: {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  // OG/Twitter images come from the app/opengraph-image.tsx and
+  // app/twitter-image.tsx file conventions — Next wires them in automatically,
+  // so there's no static PNG to fall out of date (or 404, as the old one did).
   openGraph: {
     type: "website",
-    url: siteConfig.url,
+    url: siteUrl,
     title: siteConfig.title,
     description: siteConfig.description,
     siteName: siteConfig.name,
-    images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
+    locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [siteConfig.ogImage],
   },
   icons: { icon: "/favicon.svg" },
 };
@@ -79,9 +84,30 @@ const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: siteConfig.name,
-  url: siteConfig.url,
-  jobTitle: "Associate Software Engineer",
-  worksFor: { "@type": "Organization", name: "Lystra Pharma Private Limited" },
+  url: siteUrl,
+  jobTitle: siteConfig.role,
+  worksFor: { "@type": "Organization", name: siteConfig.company },
+  alumniOf: {
+    "@type": "CollegeOrUniversity",
+    name: "Dhanalakshmi Srinivasan University",
+  },
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Visakhapatnam",
+    addressCountry: "IN",
+  },
+  knowsAbout: [
+    "Full-Stack Development",
+    "MERN Stack",
+    "React",
+    "Node.js",
+    "TypeScript",
+    "REST API Design",
+    "MongoDB",
+    "AWS",
+    "System Design",
+    "Machine Learning",
+  ],
   description: siteConfig.description,
   email: `mailto:${siteConfig.email}`,
   sameAs: siteConfig.links

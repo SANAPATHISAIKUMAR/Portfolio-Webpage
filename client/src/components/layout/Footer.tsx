@@ -1,6 +1,7 @@
 "use client";
 
-import { Mail, ArrowUp, MapPin, Download, ExternalLink, Heart } from "lucide-react";
+import Link from "next/link";
+import { Mail, ArrowUp, MapPin, FileText, ExternalLink, Heart } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "../ui/SocialIcons";
 import { motion } from "framer-motion";
 import { siteConfig, navigationItems } from "../../config/site";
@@ -24,7 +25,10 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden border-t border-hairline bg-[var(--color-bg-secondary)]">
+    <footer
+      data-site-footer
+      className="relative overflow-hidden border-t border-hairline bg-[var(--color-bg-secondary)]"
+    >
       {/* Gradient top accent line */}
       <div
         className="absolute top-0 inset-x-0 h-px"
@@ -127,14 +131,14 @@ export function Footer() {
             <ul className="flex flex-col gap-3.5">
               {navigationItems.map((item) => (
                 <li key={item.href}>
-                  <a
+                  <Link
                     href={`/${item.href}`}
                     className="group inline-flex items-center gap-1.5 text-[14px] text-text-secondary transition-all duration-200 hover:text-text-primary hover:translate-x-0.5"
                     style={{ display: "inline-flex" }}
                   >
                     <span className="h-px w-3 rounded-full bg-hairline-strong transition-all duration-200 group-hover:w-4 group-hover:bg-accent-blue" />
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -160,14 +164,13 @@ export function Footer() {
                 <span>{siteConfig.location}</span>
               </li>
               <li>
-                <a
+                <Link
                   href={siteConfig.resume}
-                  download
                   className="mt-1 inline-flex items-center gap-2 rounded-xl border border-hairline-strong bg-surface-1 px-4 py-2.5 text-[13px] font-medium text-text-primary transition-all duration-200 hover:bg-surface-2 hover:border-text-muted hover:shadow-[0_0_12px_rgba(59,130,246,0.1)]"
                 >
-                  <Download size={13} strokeWidth={2.2} />
-                  Download Résumé
-                </a>
+                  <FileText size={13} strokeWidth={2.2} />
+                  View Résumé
+                </Link>
               </li>
             </ul>
           </div>

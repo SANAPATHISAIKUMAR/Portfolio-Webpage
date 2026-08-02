@@ -9,33 +9,25 @@ import { SectionHeading } from "../ui/SectionHeading";
 import { StatCard } from "../ui/StatCard";
 import { GithubIcon } from "../ui/SocialIcons";
 import { useGitHubStats } from "../../hooks/useGitHubStats";
-import { siteConfig } from "../../config/site";
+import { GITHUB_PROFILE_URL as GITHUB_PROFILE, languageColor } from "../../config/github";
+import { projects } from "../../data/projects";
 
-const GITHUB_PROFILE =
-  siteConfig.links.find((l) => l.platform === "GitHub")?.url ??
-  "https://github.com";
-const GITHUB_USERNAME = GITHUB_PROFILE.split("/").filter(Boolean).pop() ?? "";
-
-const languageColors: Record<string, string> = {
-  TypeScript: "#3178C6",
-  JavaScript: "#F7DF1E",
-  Python: "#3776AB",
-  HTML: "#E34F26",
-  CSS: "#1572B6",
-  Java: "#B07219",
-  "C++": "#F34B7D",
-  Go: "#00ADD8",
-  Rust: "#DEA584",
-  Shell: "#89E051",
-  Vue: "#41B883",
-  Dart: "#00B4AB",
-};
+/**
+ * Curated one-liners keyed by repo name, used when a repository has no
+ * description set on GitHub — a blank card reads as an abandoned repo.
+ */
+const taglineByRepo = new Map(
+  projects
+    .filter((p) => p.repo)
+    .map((p) => [p.repo!.toLowerCase(), p.tagline] as const)
+);
 
 function OpenSourceContent() {
-  const { data, isLoading, isError } = useGitHubStats(GITHUB_USERNAME);
+  const { data, isLoading, isError } = useGitHubStats();
 
   const user = data?.user ?? null;
-  const repos = data?.repos ?? [];
+  // Top 4 by stars, then most recently pushed — the server already ordered them.
+  const repos = (data?.repos ?? []).slice(0, 4);
   const languages = data?.languages ?? [];
   const totalStars = data?.totalStars ?? 0;
   const totalLangRepos = languages.reduce((sum, l) => sum + l.count, 0) || 1;
@@ -129,7 +121,7 @@ function OpenSourceContent() {
                       key={lang.name}
                       style={{
                         width: `${(lang.count / totalLangRepos) * 100}%`,
-                        backgroundColor: languageColors[lang.name] || "#8B949E",
+                        backgroundColor: languageColor(lang.name),
                       }}
                       title={`${lang.name} — ${lang.count} repos`}
                     />
@@ -143,7 +135,7 @@ function OpenSourceContent() {
                     >
                       <span
                         className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: languageColors[lang.name] || "#8B949E" }}
+                        style={{ backgroundColor: languageColor(lang.name) }}
                       />
                       {lang.name}
                     </span>
@@ -176,9 +168,9 @@ function OpenSourceContent() {
                         <ExternalLink size={14} className="text-text-muted" />
                       </div>
 
-                      {repo.description && (
+                      {(repo.description ?? taglineByRepo.get(repo.name.toLowerCase())) && (
                         <p className="text-xs text-text-muted leading-relaxed mb-4 line-clamp-2">
-                          {repo.description}
+                          {repo.description ?? taglineByRepo.get(repo.name.toLowerCase())}
                         </p>
                       )}
 
@@ -187,9 +179,7 @@ function OpenSourceContent() {
                           <span className="flex items-center gap-1.5">
                             <span
                               className="w-2.5 h-2.5 rounded-full"
-                              style={{
-                                backgroundColor: languageColors[repo.language] || "#8B949E",
-                              }}
+                              style={{ backgroundColor: languageColor(repo.language) }}
                             />
                             {repo.language}
                           </span>

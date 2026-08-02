@@ -90,214 +90,236 @@
    BASE STYLES
    =================================== */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/*
+ * Everything from here to the end of the TYPOGRAPHY block lives in `@layer
+ * base` on purpose.
+ *
+ * Tailwind v4 emits its utilities inside `@layer utilities`, and CSS gives
+ * *unlayered* rules higher priority than any layered rule regardless of
+ * specificity. While this reset sat outside a layer, `* { margin: 0; padding: 0 }`
+ * silently beat every `p-*`, `m-*`, `mx-auto` and `space-y-*` utility in the
+ * codebase — computed padding on a `p-6` element was 0px. Putting it in `base`
+ * restores the intended precedence: base < components < utilities.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  /* Guard against any decorative element widening the page and pushing
-     centered content off-axis. */
-  overflow-x: hidden;
-  width: 100%;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Guard against any decorative element widening the page and pushing
+       centered content off-axis. */
+    overflow-x: hidden;
+    width: 100%;
+  }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-bg);
-  background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.05) 0%, transparent 70%);
-  background-attachment: fixed;
-  color: var(--color-text-primary);
-  line-height: 1.6;
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
-}
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.05) 0%, transparent 70%);
+    background-attachment: fixed;
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+  }
 
-#root,
-body > div:first-child {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  #root,
+  body > div:first-child {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===================================
+     SCROLLBAR
+     =================================== */
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.4), rgba(124, 58, 237, 0.4));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.6), rgba(124, 58, 237, 0.6));
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.3) var(--color-bg);
+  }
+
+  /* ===================================
+     SELECTION
+     =================================== */
+
+  ::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: var(--color-text-primary);
+  }
+
+  /* ===================================
+     TYPOGRAPHY
+     =================================== */
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 /* ===================================
-   SCROLLBAR
+   COMPONENT CLASSES
+   In `@layer components` so Tailwind utilities can override them — e.g.
+   `class="section-container max-w-5xl"` must let `max-w-5xl` win.
    =================================== */
 
-::-webkit-scrollbar {
-  width: 6px;
-}
+@layer components {
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-::-webkit-scrollbar-track {
-  background: var(--color-bg);
-}
+  .gradient-text-tri {
+    background: var(--gradient-tri);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.4), rgba(124, 58, 237, 0.4));
-  border-radius: 3px;
-}
+  .gradient-border {
+    position: relative;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.6), rgba(124, 58, 237, 0.6));
-}
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 1px;
+    pointer-events: none;
+  }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(59, 130, 246, 0.3) var(--color-bg);
-}
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+  }
 
-/* ===================================
-   SELECTION
-   =================================== */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--surface-2), var(--glass-shadow);
+    border-radius: var(--radius-lg);
+    transition: transform 0.4s var(--ease-out-expo), border-color 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+  }
 
-::selection {
-  background: rgba(59, 130, 246, 0.3);
-  color: var(--color-text-primary);
-}
+  /* Theme-aware hover: hairline + the theme's own glass shadow, so cards read
+     correctly in both dark and light rather than baking in white/black. */
+  .glass-card:hover {
+    border-color: var(--hairline-strong);
+    box-shadow: inset 0 1px 0 var(--surface-2), var(--glass-shadow), 0 0 20px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+  }
 
-/* ===================================
-   TYPOGRAPHY
-   =================================== */
+  .section-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    /* Horizontal only — deliberately NOT the `padding` shorthand. This rule sits
+       outside Tailwind's utility layer, so `padding: 0 …` beat any `pt-*`/`pb-*`
+       utility on the same element and silently zeroed it, sliding page content
+       under the fixed navbar on /projects/* and /resume. Vertical rhythm belongs
+       to .section-padding. */
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
+  .section-padding {
+    padding-top: clamp(56px, 7vw, 88px);
+    padding-bottom: clamp(56px, 7vw, 88px);
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  /* Gradient blob decorations */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    pointer-events: none;
+  }
 
-/* ===================================
-   UTILITY CLASSES
-   =================================== */
+  .blob-blue {
+    background: rgba(59, 130, 246, 0.15);
+  }
 
-.gradient-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+  .blob-purple {
+    background: rgba(124, 58, 237, 0.15);
+  }
 
-.gradient-text-tri {
-  background: var(--gradient-tri);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+  .blob-cyan {
+    background: rgba(6, 182, 212, 0.12);
+  }
 
-.gradient-border {
-  position: relative;
-  border: 1px solid transparent;
-  background-clip: padding-box;
-}
+  /* Noise texture overlay */
+  .noise-overlay::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
 
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: var(--gradient-primary);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 1px;
-  pointer-events: none;
-}
+  /* Grid line decoration */
+  .grid-pattern {
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
 
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-}
-
-.glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: inset 0 1px 0 var(--surface-2), var(--glass-shadow);
-  border-radius: var(--radius-lg);
-  transition: transform 0.4s var(--ease-out-expo), border-color 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
-}
-
-/* Theme-aware hover: hairline + the theme's own glass shadow, so cards read
-   correctly in both dark and light rather than baking in white/black. */
-.glass-card:hover {
-  border-color: var(--hairline-strong);
-  box-shadow: inset 0 1px 0 var(--surface-2), var(--glass-shadow), 0 0 20px rgba(59, 130, 246, 0.1);
-  transform: translateY(-2px);
-}
-
-.section-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 2rem);
-}
-
-.section-padding {
-  padding-top: clamp(56px, 7vw, 88px);
-  padding-bottom: clamp(56px, 7vw, 88px);
-}
-
-/* Gradient blob decorations */
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.blob-blue {
-  background: rgba(59, 130, 246, 0.15);
-}
-
-.blob-purple {
-  background: rgba(124, 58, 237, 0.15);
-}
-
-.blob-cyan {
-  background: rgba(6, 182, 212, 0.12);
-}
-
-/* Noise texture overlay */
-.noise-overlay::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-}
-
-/* Grid line decoration */
-.grid-pattern {
-  background-image:
-    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-/* Dot pattern */
-.dot-pattern {
-  background-image: radial-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
+  /* Dot pattern */
+  .dot-pattern {
+    background-image: radial-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
 }
 
 /* ===================================
@@ -462,5 +484,72 @@ img {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ===================================
+   PRINT — /resume must produce a clean,
+   ATS-readable PDF via Ctrl/Cmd + P
+   =================================== */
+
+@page {
+  size: A4;
+  margin: 14mm 14mm;
+}
+
+@media print {
+  /* Force light-on-white regardless of the visitor's theme. */
+  :root,
+  html.dark {
+    color-scheme: light;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  /* Site chrome and decoration have no place in a printed résumé. */
+  header[data-site-header],
+  footer[data-site-footer],
+  [data-print-hide],
+  canvas {
+    display: none !important;
+  }
+
+  .print-document {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-document * {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    color: #111827 !important;
+  }
+
+  .print-document a {
+    text-decoration: none !important;
+  }
+
+  /* Keep a section and its heading on the same page. */
+  .print-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-document h1,
+  .print-document h2,
+  .print-document h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .print-document hr,
+  .print-rule {
+    border-color: #d1d5db !important;
   }
 }

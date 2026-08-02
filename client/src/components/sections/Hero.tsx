@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Download, Mail, Sparkles, Award, Users, Stethoscope, GraduationCap } from "lucide-react";
+import { ArrowRight, FileText, Mail, Sparkles, Award, Users, Stethoscope, GraduationCap } from "lucide-react";
 import { TypingAnimation } from "../effects/TextReveal";
 import { MagneticButton } from "../effects/MagneticButton";
 import { ParticleField } from "../effects/ParticleField";
@@ -181,9 +181,8 @@ export function Hero() {
               variant="secondary"
               size="lg"
               href={siteConfig.resume}
-              download
             >
-              <Download size={16} />
+              <FileText size={16} />
               Resume
             </MagneticButton>
 

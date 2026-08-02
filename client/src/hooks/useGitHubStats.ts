@@ -1,67 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
-import type { GitHubRepo, GitHubUser } from "../types";
-
-interface ApiRepo extends GitHubRepo {
-  fork?: boolean;
-}
-
-export interface GitHubStats {
-  user: GitHubUser;
-  /** Top repos by stars, then most recently updated. */
-  repos: ApiRepo[];
-  totalStars: number;
-  /** Most-used languages across non-fork repos. */
-  languages: { name: string; count: number }[];
-}
-
-async function fetchGitHubStats(
-  username: string,
-  signal?: AbortSignal
-): Promise<GitHubStats> {
-  const [userRes, reposRes] = await Promise.all([
-    fetch(`https://api.github.com/users/${username}`, { signal }),
-    fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`, {
-      signal,
-    }),
-  ]);
-
-  if (!userRes.ok || !reposRes.ok) throw new Error("GitHub API error");
-
-  const user: GitHubUser = await userRes.json();
-  const reposData: ApiRepo[] = await reposRes.json();
-  const ownRepos = reposData.filter((r) => !r.fork);
-
-  const totalStars = ownRepos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
-
-  const langCount: Record<string, number> = {};
-  ownRepos.forEach((r) => {
-    if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1;
-  });
-  const languages = Object.entries(langCount)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 6);
-
-  const repos = [...ownRepos]
-    .sort(
-      (a, b) =>
-        (b.stargazers_count || 0) - (a.stargazers_count || 0) ||
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    )
-    .slice(0, 4);
-
-  return { user, repos, totalStars, languages };
-}
+import type { GitHubData } from "../types";
 
 /**
- * Fetches + aggregates public GitHub stats via React Query — gives caching
- * (no refetch across remounts), a retry for the flaky unauthenticated API, and
- * automatic request cancellation. Keeps OpenSource purely presentational.
+ * Reads the live GitHub snapshot from our own `/api/github` route.
+ *
+ * It deliberately does *not* call api.github.com: unauthenticated GitHub
+ * requests are capped at 60/hour per IP, so hitting it from every visitor's
+ * browser meant the section broke for anyone behind a shared/corporate IP.
+ * The route handler fetches once an hour server-side for everyone.
  */
-export function useGitHubStats(username: string) {
+async function fetchGitHubStats(signal?: AbortSignal): Promise<GitHubData> {
+  const res = await fetch("/api/github", { signal });
+  if (!res.ok) throw new Error(`GitHub stats unavailable (${res.status})`);
+  return (await res.json()) as GitHubData;
+}
+
+export function useGitHubStats() {
   return useQuery({
-    queryKey: ["github-stats", username],
-    queryFn: ({ signal }) => fetchGitHubStats(username, signal),
+    queryKey: ["github-stats"],
+    queryFn: ({ signal }) => fetchGitHubStats(signal),
     staleTime: 1000 * 60 * 30,
     retry: 1,
     refetchOnWindowFocus: false,

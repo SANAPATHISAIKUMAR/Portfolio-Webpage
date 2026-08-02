@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Check, Sparkles, Target, Lightbulb, Wrench, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, Sparkles, Target, Lightbulb, Wrench, TrendingUp, Star, GitFork, History } from "lucide-react";
 import { GithubIcon } from "../../../components/ui/SocialIcons";
 import { projects } from "../../../data/projects";
 import { getProjectBySlug, categoryLabels } from "../../../lib/projects";
+import { getRepoStats } from "../../../lib/github";
+import { languageColor, repoUrl } from "../../../config/github";
 import { siteConfig } from "../../../config/site";
+import { getSiteUrl } from "../../../config/site-url";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -21,17 +24,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const project = getProjectBySlug(slug);
   if (!project) return { title: "Project not found" };
 
-  const url = `${siteConfig.url}/projects/${project.slug}`;
+  const path = `/projects/${project.slug}`;
   return {
     title: `${project.title} — Case Study`,
     description: project.description,
-    alternates: { canonical: url },
+    alternates: { canonical: path },
+    // The OG image comes from the sibling opengraph-image.tsx, generated per
+    // project — no static asset to maintain.
     openGraph: {
       type: "article",
-      url,
+      url: `${getSiteUrl()}${path}`,
       title: `${project.title} — ${siteConfig.name}`,
       description: project.description,
-      images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: project.title }],
     },
     twitter: {
       card: "summary_large_image",
@@ -67,14 +71,20 @@ export default async function ProjectCaseStudy({ params }: PageProps) {
   const project = getProjectBySlug(slug);
   if (!project) notFound();
 
+  const codeUrl = project.repo ? repoUrl(project.repo) : undefined;
+  const stats = project.repo
+    ? (await getRepoStats())[project.repo.toLowerCase()]
+    : undefined;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: project.title,
     description: project.description,
-    url: `${siteConfig.url}/projects/${project.slug}`,
-    author: { "@type": "Person", name: siteConfig.name, url: siteConfig.url },
+    url: `${getSiteUrl()}/projects/${project.slug}`,
+    author: { "@type": "Person", name: siteConfig.name, url: getSiteUrl() },
     keywords: project.techStack.join(", "),
+    ...(codeUrl && { codeRepository: codeUrl }),
   };
 
   return (
@@ -120,7 +130,7 @@ export default async function ProjectCaseStudy({ params }: PageProps) {
           <p className="mt-3 text-section-subtitle text-text-secondary">{project.tagline}</p>
 
           {/* Actions */}
-          {(project.liveUrl || project.githubUrl) && (
+          {(project.liveUrl || codeUrl) && (
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {project.liveUrl && (
                 <a
@@ -133,9 +143,9 @@ export default async function ProjectCaseStudy({ params }: PageProps) {
                   <ArrowUpRight size={15} />
                 </a>
               )}
-              {project.githubUrl && (
+              {codeUrl && (
                 <a
-                  href={project.githubUrl}
+                  href={codeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex h-11 items-center gap-2 rounded-xl border border-hairline-strong bg-surface-1 px-5 text-sm font-medium text-text-primary transition-colors hover:bg-surface-2"
@@ -145,6 +155,38 @@ export default async function ProjectCaseStudy({ params }: PageProps) {
                 </a>
               )}
             </div>
+          )}
+
+          {/* Live repository stats, straight from the GitHub API */}
+          {stats && (
+            <dl className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-sm text-text-secondary">
+              {stats.language && (
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: languageColor(stats.language) }}
+                    aria-hidden
+                  />
+                  <dt className="sr-only">Primary language</dt>
+                  <dd>{stats.language}</dd>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5">
+                <Star size={14} aria-hidden />
+                <dt className="sr-only">Stars</dt>
+                <dd>{stats.stars}</dd>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <GitFork size={14} aria-hidden />
+                <dt className="sr-only">Forks</dt>
+                <dd>{stats.forks}</dd>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <History size={14} aria-hidden />
+                <dt className="sr-only">Last updated</dt>
+                <dd>Updated {stats.updatedLabel}</dd>
+              </div>
+            </dl>
           )}
         </header>
 

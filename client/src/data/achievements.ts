@@ -1,4 +1,6 @@
 import type { Achievement } from "../types";
+import { projects } from "./projects";
+import { hackathons } from "./hackathons";
 
 export const achievements: Achievement[] = [
   {
@@ -20,8 +22,8 @@ export const achievements: Achievement[] = [
   {
     id: "hackathons-count",
     title: "Hackathons",
-    value: "5",
-    description: "Competed in 5 national and global hackathons in 2025",
+    value: `${hackathons.length}`,
+    description: `Competed in ${hackathons.length} national and global hackathons in 2025`,
     category: "competitive",
     icon: "⚡",
   },
@@ -36,8 +38,8 @@ export const achievements: Achievement[] = [
   {
     id: "projects-built",
     title: "Projects Shipped",
-    value: "5+",
-    description: "Built and shipped AI-integrated web applications and prototypes",
+    value: `${projects.length}`,
+    description: "Production platforms, deep-tech builds, and AI-integrated web applications",
     category: "academic",
     icon: "🚀",
   },
@@ -64,5 +66,13 @@ export const achievements: Achievement[] = [
     description: "Generative AI, JavaScript, and HTML/CSS — HCL GUVI & Microsoft",
     category: "academic",
     icon: "📜",
+  },
+  {
+    id: "tech-breadth",
+    title: "Technologies",
+    value: `${new Set(projects.flatMap((p) => p.techStack)).size}+`,
+    description: "Distinct technologies used across shipped projects",
+    category: "academic",
+    icon: "🛠️",
   },
 ];

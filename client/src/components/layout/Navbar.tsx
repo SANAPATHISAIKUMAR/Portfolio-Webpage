@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Menu, X, ArrowUpRight, Mail } from "lucide-react";
+import { FileText, Menu, X, ArrowUpRight, Mail } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "../ui/SocialIcons";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
@@ -125,6 +125,7 @@ export function Navbar() {
 
       {/* Navbar */}
       <motion.header
+        data-site-header
         className="fixed inset-x-0 top-0 z-[1000]"
         initial={{ y: -100 }}
         animate={{ y: isVisible ? 0 : -100 }}
@@ -278,9 +279,8 @@ export function Navbar() {
                   href={siteConfig.resume}
                   variant="secondary"
                   size="md"
-                  download
                 >
-                  <Download size={13} strokeWidth={2.2} />
+                  <FileText size={13} strokeWidth={2.2} />
                   Resume
                 </MagneticButton>
 
@@ -406,9 +406,8 @@ export function Navbar() {
                   href={siteConfig.resume}
                   variant="ghost"
                   size="sm"
-                  download
                 >
-                  <Download size={13} strokeWidth={2.2} />
+                  <FileText size={13} strokeWidth={2.2} />
                   Resume
                 </MagneticButton>
                 <MagneticButton

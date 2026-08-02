@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
+import Link from "next/link";
 import { cn } from "../../lib/utils";
 
 interface MagneticButtonProps {
@@ -80,6 +81,19 @@ export function MagneticButton({
   );
 
   if (href) {
+    // Internal routes go through next/link for client-side navigation;
+    // anything external, hash-only, or a download stays a plain anchor.
+    const isInternalRoute =
+      href.startsWith("/") && !href.startsWith("//") && !download && !target;
+
+    if (isInternalRoute) {
+      return (
+        <Link href={href} className={baseStyles} aria-label={ariaLabel}>
+          {children}
+        </Link>
+      );
+    }
+
     return (
       <a
         href={href}

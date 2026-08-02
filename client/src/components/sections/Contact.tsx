@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -13,11 +13,13 @@ import { siteConfig } from "../../config/site";
 import { cn } from "../../lib/utils";
 import { contactSchema, type ContactFormValues } from "../../lib/validations";
 
-type FormStatus = "idle" | "submitting" | "success" | "error";
+type FormStatus = "idle" | "submitting" | "success" | "error" | "mailto";
 
 export function Contact() {
   const [status, setStatus] = useState<FormStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
   const {
@@ -30,48 +32,56 @@ export function Contact() {
     mode: "onBlur",
   });
 
+  /** Opens the visitor's mail client with the message pre-filled. */
+  const openMailClient = (data: ContactFormValues) => {
+    const body = encodeURIComponent(
+      `${data.message}\n\n— ${data.name} (${data.email})`
+    );
+    const subject = encodeURIComponent(data.subject);
+    window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
+  };
+
   const onSubmit = async (data: ContactFormValues) => {
     setStatus("submitting");
-
-    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY as string | undefined;
-
-    // Graceful fallback: with no serverless email key configured, open the
-    // visitor's mail client with the message pre-filled instead of failing.
-    if (!accessKey) {
-      const body = encodeURIComponent(
-        `${data.message}\n\n— ${data.name} (${data.email})`
-      );
-      const subject = encodeURIComponent(data.subject);
-      window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
-      setStatus("idle");
-      return;
-    }
+    setErrorMessage(null);
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          access_key: accessKey,
-          name: data.name,
-          email: data.email,
-          subject: data.subject,
-          message: data.message,
-          from_name: "Portfolio Contact Form",
-        }),
+        headers: { "Content-Type": "application/json" },
+        // `company` is the honeypot — left empty by real people.
+        body: JSON.stringify({ ...data, company: honeypotRef.current?.value ?? "" }),
       });
 
-      const result = await response.json();
-      if (!response.ok || !result.success) {
+      // 501 means no email provider is configured on this deployment. Fall back
+      // to the mail client and *say so*, rather than silently doing nothing.
+      if (response.status === 501) {
+        openMailClient(data);
+        setStatus("mailto");
+        setTimeout(() => setStatus("idle"), 8000);
+        return;
+      }
+
+      const result = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        message?: string;
+      };
+
+      if (!response.ok || !result.ok) {
         throw new Error(result.message || "Failed to send message");
       }
 
       setStatus("success");
       reset();
-      setTimeout(() => setStatus("idle"), 5000);
-    } catch {
+      setTimeout(() => setStatus("idle"), 6000);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error && error.message
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
       setStatus("error");
-      setTimeout(() => setStatus("idle"), 4000);
+      setTimeout(() => setStatus("idle"), 6000);
     }
   };
 
@@ -221,6 +231,19 @@ export function Contact() {
                 "border border-hairline"
               )}
             >
+              {/* Honeypot — hidden from people and assistive tech, but bots
+                  that fill every field give themselves away. */}
+              <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                <label htmlFor="contact-company">Company (leave this empty)</label>
+                <input
+                  id="contact-company"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  ref={honeypotRef}
+                />
+              </div>
+
               <div className="space-y-4">
                 {/* Name */}
                 <div>
@@ -340,6 +363,28 @@ export function Contact() {
                         Message sent! I&apos;ll get back to you soon.
                       </span>
                     </motion.div>
+                  ) : status === "mailto" ? (
+                    <motion.div
+                      key="mailto"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      role="status"
+                      className="flex items-start gap-2 py-3 text-text-secondary"
+                    >
+                      <Mail size={18} className="mt-0.5 shrink-0 text-accent-blue" />
+                      <span className="text-sm">
+                        Your email app should have opened with the message ready to
+                        send. If nothing happened, email me directly at{" "}
+                        <a
+                          href={`mailto:${siteConfig.email}`}
+                          className="font-medium text-text-primary underline underline-offset-2"
+                        >
+                          {siteConfig.email}
+                        </a>
+                        .
+                      </span>
+                    </motion.div>
                   ) : status === "error" ? (
                     <motion.div
                       key="error"
@@ -347,11 +392,11 @@ export function Contact() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                       role="alert"
-                      className="flex items-center gap-2 text-red-400 py-3"
+                      className="flex items-start gap-2 text-red-400 py-3"
                     >
-                      <AlertCircle size={18} />
+                      <AlertCircle size={18} className="mt-0.5 shrink-0" />
                       <span className="text-sm">
-                        Something went wrong. Please try again.
+                        {errorMessage ?? "Something went wrong. Please try again."}
                       </span>
                     </motion.div>
                   ) : (

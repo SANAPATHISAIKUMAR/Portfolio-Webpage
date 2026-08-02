@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ExternalLink, ArrowRight, TrendingUp, Bot, Rocket, Code2, Sparkles } from "lucide-react";
+import { ExternalLink, ArrowRight, TrendingUp, Bot, Rocket, Code2, Sparkles, Star, GitFork, History } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { GithubIcon } from "../ui/SocialIcons";
 import { cn } from "../../lib/utils";
-import type { Project } from "../../types";
+import { languageColor, repoUrl } from "../../config/github";
+import type { Project, RepoStats } from "../../types";
 
 const categoryIcon: Record<Project["category"], LucideIcon> = {
   ai: Bot,
@@ -27,12 +28,19 @@ interface ProjectCardProps {
   project: Project;
   /** Flagship layout — media beside content on desktop, more tech chips shown. */
   wide?: boolean;
+  /**
+   * Live GitHub numbers for `project.repo`, fetched server-side. Absent when
+   * the project has no public repo or GitHub was unreachable — the card just
+   * renders without the stats strip rather than showing zeroes.
+   */
+  stats?: RepoStats;
 }
 
-export function ProjectCard({ project, wide = false }: ProjectCardProps) {
+export function ProjectCard({ project, wide = false, stats }: ProjectCardProps) {
   const Icon = categoryIcon[project.category] ?? Code2;
   const chipCount = wide ? 7 : 5;
   const overflow = project.techStack.length - chipCount;
+  const codeUrl = project.repo ? repoUrl(project.repo) : undefined;
 
   return (
     <article
@@ -118,6 +126,36 @@ export function ProjectCard({ project, wide = false }: ProjectCardProps) {
           </div>
         )}
 
+        {/* Live GitHub numbers — server-fetched, refreshed hourly */}
+        {stats && (
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-text-muted">
+            {stats.language && (
+              <span className="flex items-center gap-1.5">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: languageColor(stats.language) }}
+                  aria-hidden
+                />
+                {stats.language}
+              </span>
+            )}
+            <span className="flex items-center gap-1">
+              <Star size={11} aria-hidden />
+              {stats.stars}
+              <span className="sr-only"> stars</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <GitFork size={11} aria-hidden />
+              {stats.forks}
+              <span className="sr-only"> forks</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <History size={11} aria-hidden />
+              Updated {stats.updatedLabel}
+            </span>
+          </div>
+        )}
+
         {/* Tech stack */}
         <div className="mb-5 flex flex-wrap gap-1.5">
           {project.techStack.slice(0, chipCount).map((tech) => (
@@ -147,11 +185,11 @@ export function ProjectCard({ project, wide = false }: ProjectCardProps) {
             />
           </Link>
 
-          {(project.githubUrl || project.liveUrl) && (
+          {(codeUrl || project.liveUrl) && (
             <div className="ml-auto flex items-center gap-3">
-              {project.githubUrl && (
+              {codeUrl && (
                 <a
-                  href={project.githubUrl}
+                  href={codeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${project.title} source code`}
