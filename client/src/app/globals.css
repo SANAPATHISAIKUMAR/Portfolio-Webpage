@@ -326,11 +326,23 @@
    ENHANCED SECTION DIVIDERS
    =================================== */
 
-section {
+/*
+  Scoped to *direct* children of <main> on purpose.
+
+  Unscoped, these rules hit every nested <section> too — the résumé's seven
+  sections and each case-study prose block — drawing a stray gradient line
+  through documents that should be clean. `main > section` matches only the
+  home page's top-level sections, which is all this was ever meant to decorate.
+
+  The `position: relative` needs the same scope for a second reason: this block
+  is unlayered, so in Tailwind v4 it outranks @layer utilities and would
+  silently defeat an `absolute`/`sticky` class on any <section>.
+*/
+main > section {
   position: relative;
 }
 
-section::after {
+main > section::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -342,8 +354,7 @@ section::after {
   background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.15), rgba(124, 58, 237, 0.15), transparent);
 }
 
-/* Don't show divider on last section or when footer is the next sibling */
-section:last-of-type::after,
+/* No divider under the final section — the footer's own border takes over. */
 main > section:last-child::after {
   display: none;
 }
@@ -497,6 +508,24 @@ img {
   margin: 14mm 14mm;
 }
 
+/*
+  Résumé type scale.
+
+  The résumé page sets every size from these variables rather than hardcoding
+  px, so the printed sheet can be tightened independently of the screen without
+  touching a single className. Hardcoded `text-[11.5px]` classes cannot be
+  overridden by an ancestor `font-size`, which is exactly why the print density
+  rules used to have no effect on this page.
+*/
+.print-document {
+  --r-name: 24px;
+  --r-headline: 13px;
+  --r-h3: 12.5px;
+  --r-body: 11.5px;
+  --r-meta: 11px;
+  --r-small: 10.5px;
+}
+
 @media print {
   /* Force light-on-white regardless of the visitor's theme. */
   :root,
@@ -531,14 +560,56 @@ img {
     color: #111827 !important;
   }
 
+  /*
+    Exempt the list bullets from the rule above. They are styled spans rather
+    than list markers, so blanking every background erased them and left the
+    achievement lines looking like stray indented text.
+  */
+  .print-document .print-bullet {
+    background: #111827 !important;
+  }
+
+  /*
+    The same trap as the bullets, one layer along: `border-hairline` is white at
+    8% alpha, so once the sheet is forced onto white the rules above and below
+    each section heading vanish. They are the résumé's primary structural cue —
+    without them the headings float as unanchored grey text — so re-ink them
+    here. `.print-document *` normalises color but never border-color, which is
+    why this needs saying explicitly.
+  */
+  .print-document .resume-heading {
+    border-color: #9ca3af !important;
+  }
+
+  /* The on-screen container clears the fixed navbar; on paper that is just a
+     blank third of the first page. */
+  .print-page {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
   .print-document a {
     text-decoration: none !important;
   }
 
-  /* Keep a section and its heading on the same page. */
+  /*
+    Entries used to carry `break-inside: avoid` to keep one job or project off a
+    page boundary. That backfired: a tall project entry that didn't fit jumped
+    wholesale to the next page, stranding 507pt of trailing whitespace across
+    three pages — roughly two-thirds of a sheet of nothing.
+
+    Entries now flow and may split. `orphans`/`widows` stop a single line being
+    left behind, and `break-after: avoid` on headings (below) still prevents a
+    title being stranded at the foot of a page — so pages fill top to bottom and
+    only the final page ends short, which is what a résumé should look like.
+
+    orphans/widows are ignored by Firefox. That's acceptable: the committed PDF
+    is generated with headless Chrome, so the shipped artefact always gets them,
+    and a Firefox user printing the page directly loses only the refinement.
+  */
   .print-section {
-    break-inside: avoid;
-    page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
   }
 
   .print-document h1,
@@ -546,6 +617,97 @@ img {
   .print-document h3 {
     break-after: avoid;
     page-break-after: avoid;
+  }
+
+  /* A section may split across pages, but never right after its heading. */
+  .print-block {
+    break-inside: auto;
+    page-break-inside: auto;
+    margin-bottom: 0.2rem !important;
+  }
+
+  /*
+    The source placements résumé is a single page, and a one-page résumé that
+    spills two lines onto a second sheet reads worse than either a tight one or
+    an honest two. Shrink the scale ~11% for print only.
+  */
+  .print-document {
+    --r-name: 20px;
+    --r-headline: 11px;
+    --r-h3: 10.6px;
+    --r-body: 9.7px;
+    --r-meta: 9.3px;
+    --r-small: 9px;
+  }
+
+  .print-document .space-y-3 > * + * {
+    margin-top: 0.24rem !important;
+  }
+
+  /* Bullet lists carry most of the résumé's line count — tighten their leading
+     and inter-item gap rather than shrinking the type any further. */
+  .print-document li {
+    line-height: 1.28 !important;
+  }
+
+  .print-document .space-y-0\.5 > * + * {
+    margin-top: 0.04rem !important;
+  }
+
+  /* Heading rule needs less breathing room on paper than on screen. */
+  .print-document .resume-heading {
+    margin-bottom: 0.22rem !important;
+    padding-block: 0.07rem !important;
+  }
+
+  /*
+    Entry spacing. `space-y-4` between jobs and projects is right on screen but
+    compounds across ~8 entries into most of a wasted page.
+  */
+  .print-document .space-y-4 > * + * {
+    margin-top: 0.55rem !important;
+  }
+
+  .print-document ul.mt-1\.5,
+  .print-document .print-document ul {
+    margin-top: 0.2rem !important;
+  }
+
+  /*
+    Print density. On screen the résumé is airy; on paper that airiness costs
+    whole pages, so tighten type and rhythm for the printed sheet only.
+  */
+  .print-document {
+    font-size: 10.5pt;
+    line-height: 1.35;
+  }
+
+  .print-document h1 {
+    font-size: 20pt;
+  }
+
+  .print-document h2 {
+    font-size: 9pt;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .print-document h3 {
+    font-size: 11pt;
+  }
+
+  /* Collapse the generous on-screen vertical rhythm. */
+  .print-document .space-y-6 > * + *,
+  .print-document .space-y-5 > * + * {
+    margin-top: 0.6rem !important;
+  }
+
+  .print-document header {
+    margin-bottom: 0.9rem !important;
+    padding-bottom: 0.6rem !important;
+  }
+
+  @page {
+    margin: 10mm 12mm;
   }
 
   .print-document hr,

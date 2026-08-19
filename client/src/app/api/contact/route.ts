@@ -23,18 +23,26 @@ const MAX_PER_WINDOW = 5;
 /**
  * In-memory throttle. Adequate for a single-instance portfolio; swap for a
  * shared store (Upstash/Redis) if this ever runs on several instances.
+ *
+ * Checking and recording are deliberately separate calls. Doing both up front
+ * meant a validation failure still consumed quota, so five typo'd submissions
+ * locked a genuine visitor out for an hour. Only a message that reaches the
+ * point of actually being delivered counts against the budget.
  */
 const submissions = new Map<string, number[]>();
 
-function isRateLimited(ip: string): boolean {
+/** Read-only check — safe to call before the payload has been validated. */
+function isOverLimit(ip: string): boolean {
   const now = Date.now();
   const recent = (submissions.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  submissions.set(ip, recent);
+  return recent.length >= MAX_PER_WINDOW;
+}
 
-  if (recent.length >= MAX_PER_WINDOW) {
-    submissions.set(ip, recent);
-    return true;
-  }
-
+/** Count one genuine send. Call only once the message is about to go out. */
+function recordSubmission(ip: string): void {
+  const now = Date.now();
+  const recent = (submissions.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
   recent.push(now);
   submissions.set(ip, recent);
 
@@ -44,7 +52,6 @@ function isRateLimited(ip: string): boolean {
       if (times.every((t) => now - t >= WINDOW_MS)) submissions.delete(key);
     }
   }
-  return false;
 }
 
 function clientIp(request: Request): string {
@@ -67,7 +74,9 @@ export async function POST(request: Request) {
     );
   }
 
-  if (isRateLimited(clientIp(request))) {
+  const ip = clientIp(request);
+
+  if (isOverLimit(ip)) {
     return NextResponse.json(
       { message: "Too many messages sent. Please try again later." },
       { status: 429 }
@@ -105,6 +114,9 @@ export async function POST(request: Request) {
   }
 
   const { name, email, subject, message } = parsed.data;
+
+  // Valid, non-bot, and about to be delivered — now it counts.
+  recordSubmission(ip);
 
   try {
     const response = await fetch("https://api.web3forms.com/submit", {

@@ -1,17 +1,25 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { RevealOnScroll } from "../effects/RevealOnScroll";
 import { CounterAnimation } from "../effects/CounterAnimation";
 import { GlowCard } from "../effects/GlowCard";
 import { SectionHeading } from "../ui/SectionHeading";
 import { StatCard } from "../ui/StatCard";
 import { aboutTimeline, aboutDescription } from "../../data/about";
-import { heroStats } from "../../config/site";
+import { heroStats, siteConfig } from "../../config/site";
+import { professionalDevelopment } from "../../data/education";
 import { cn } from "../../lib/utils";
 import { EASE_OUT_EXPO } from "../../lib/motion";
 
 export function About() {
+  // The summit entry doubles as the caption's link target, so the URL lives in
+  // the data file rather than being hardcoded in two places.
+  const summit = professionalDevelopment.find((p) =>
+    p.name.includes("AI Impact Summit")
+  );
   return (
     <section
       id="about"
@@ -54,6 +62,39 @@ export function About() {
           {/* Left — Story */}
           <RevealOnScroll direction="left">
             <div className="space-y-6">
+              {/*
+                Photo from the AI Impact Summit India 2026 — the event's real
+                name; an earlier version of this file called it the "India AI
+                Summit" after misreading the partly-obscured banner. Kept as the
+                full frame rather than a crop: the flags and the banner are what
+                make it worth showing, and a headshot would throw that away.
+              */}
+              <figure className="overflow-hidden rounded-2xl border border-hairline bg-surface-1">
+                <div className="relative aspect-4/3">
+                  <Image
+                    src="/images/sai-kumar-ai-impact-summit-2026.jpg"
+                    alt={`${siteConfig.name} at the AI Impact Summit India 2026`}
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="object-cover object-[center_38%]"
+                  />
+                </div>
+                <figcaption className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-hairline px-4 py-2.5 text-caption text-text-muted">
+                  <span>At the AI Impact Summit India 2026</span>
+                  {summit?.url && (
+                    <a
+                      href={summit.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-text-secondary transition-colors hover:text-text-primary"
+                    >
+                      Read the write-up
+                      <ArrowUpRight size={12} aria-hidden />
+                    </a>
+                  )}
+                </figcaption>
+              </figure>
+
               {aboutDescription.split("\n\n").map((paragraph, index) => (
                 <p
                   key={index}

@@ -5,14 +5,17 @@ import { experiences } from "../data/experience";
 
 export const siteConfig: SiteConfig = {
   name: "Sanapathi Sai Kumar",
-  title: "Sai Kumar — Associate Software Engineer | MERN & Full-Stack Developer",
+  title: "Sai Kumar — Full-Stack Developer | Associate Software Engineer",
   description:
-    "Associate Software Engineer specializing in MERN-stack development — building scalable full-stack healthcare applications, responsive UIs, REST APIs, and AI-powered solutions, with growing expertise in AWS, cloud computing, and system design.",
+    "Final-year B.Tech CSE (AI & ML) student and Associate Software Engineer — backend-leaning full-stack developer building production healthcare applications with Node.js, Express.js, MongoDB and React. Meta PyTorch OpenEnv Hackathon finalist, top 3% of 31,000+ teams.",
   role: "Associate Software Engineer",
   company: "Lystra Pharma Private Limited",
   availability: "Open to Software Engineer roles",
+  // Verbatim from the optimized placements résumé.
   summary:
-    "I'm an Associate Software Engineer specializing in MERN-stack development with experience building scalable full-stack healthcare applications. I develop responsive user interfaces, REST APIs, backend services, and AI-powered solutions while continuously expanding my expertise in AWS, Cloud Computing, Machine Learning, and System Design.",
+    "Final-year B.Tech CSE (AI & ML) student and Associate Software Engineer with production experience building healthcare applications. Backend-leaning full-stack developer experienced in REST APIs, JWT authentication, role-based access control and real-time systems using Node.js, Express.js, MongoDB and React. Meta PyTorch OpenEnv Hackathon finalist — top 3% of 31,000+ teams.",
+  /** Sub-headline under the name on the résumé. */
+  headline: "B.Tech CSE (AI & ML) | Full-Stack Developer | Software Engineering",
   links: [
     {
       platform: "GitHub",
@@ -35,7 +38,9 @@ export const siteConfig: SiteConfig = {
   ],
   email: "saikranthi1401@gmail.com",
   location: "Visakhapatnam, India",
+  phone: "+91 73860 27037",
   resume: "/resume",
+  resumePdf: "/resume/Sanapathi_Sai_Kumar_Resume.pdf",
 };
 
 export const navigationItems: NavItem[] = [
@@ -50,10 +55,10 @@ export const navigationItems: NavItem[] = [
 
 export const heroRoles = [
   "Associate Software Engineer",
-  "MERN Stack Developer",
   "Full-Stack Developer",
+  "MERN Stack Developer",
   "React & Node.js Developer",
-  "AI Integration Engineer",
+  "B.Tech CSE (AI & ML)",
 ];
 
 /**

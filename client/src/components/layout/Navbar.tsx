@@ -144,13 +144,19 @@ export function Navbar() {
           }}
         >
           {/*
-            3-column grid: logo | nav-links | actions
-            Each outer column is `1fr` so the logo aligns with the page's left
-            edge and actions with its right edge — the center column is `auto`
-            so the nav links naturally center in the remaining space.
+            3-column grid: logo | nav-links | actions.
+            The outer columns are `auto` so they always get their content width —
+            the logo can't wrap and the actions can't be pushed off-screen. The
+            center column is `minmax(0, 1fr)`, so it takes the remaining space,
+            centers the links within it, and is the one that absorbs pressure
+            when the viewport is tight.
+
+            This replaced `[1fr_auto_1fr]`, where the `auto` center column never
+            yielded: between 1024px and ~1400px the links pushed the theme
+            toggle, Resume and Hire Me clean off the right edge.
           */}
           <nav
-            className="w-full grid grid-cols-[1fr_auto_1fr] items-center gap-x-8 py-6 px-[clamp(1.5rem,5vw,4rem)]"
+            className="w-full grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 py-6 px-[clamp(1.5rem,5vw,4rem)] 2xl:gap-x-8"
             role="navigation"
             aria-label="Main navigation"
           >
@@ -195,12 +201,18 @@ export function Navbar() {
             </Link>
 
             {/* ── Desktop nav links ─────────────────────────────── */}
+            {/*
+              `xl` (1280px), not `lg` (1024px): the full desktop bar needs about
+              1470px at its original spacing, so at `lg` it overflowed and hid
+              the CTAs. Below 1280px the hamburger takes over — it carries the
+              same Resume and Hire Me buttons, so nothing is lost.
+            */}
             <div
-              className="hidden items-center justify-center lg:flex"
+              className="hidden items-center justify-center xl:flex"
               role="list"
             >
               {/* Free-standing links — no container box, maximum breathing room */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 2xl:gap-3">
                 {navigationItems.map(({ href, label }) => {
                   const active = activeSection === href.replace("#", "");
                   return (
@@ -210,7 +222,7 @@ export function Navbar() {
                       onClick={(e) => handleAnchorClick(e, href)}
                       role="listitem"
                       aria-current={active ? "page" : undefined}
-                      className="group relative flex flex-col items-center gap-0 whitespace-nowrap px-6 py-3 transition-colors duration-200"
+                      className="group relative flex flex-col items-center gap-0 whitespace-nowrap px-3 py-3 transition-colors duration-200 2xl:px-6"
                     >
                       {/* Subtle hover background */}
                       <motion.span
@@ -270,8 +282,8 @@ export function Navbar() {
             <div className="flex shrink-0 items-center gap-3 justify-self-end">
               <ThemeToggle />
 
-              {/* Desktop-only CTA buttons */}
-              <div className="hidden items-center gap-2 lg:flex">
+              {/* Desktop-only CTA buttons — mirrored in the mobile menu below */}
+              <div className="hidden items-center gap-2 xl:flex">
                 {/* Thin vertical separator */}
                 <div className="h-5 w-px bg-hairline-strong" aria-hidden="true" />
 
@@ -303,7 +315,7 @@ export function Navbar() {
                 aria-expanded={isMobileMenuOpen ? "true" : "false"}
                 aria-controls="mobile-menu"
                 onClick={() => setIsMobileMenuOpen((v) => !v)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-hairline bg-surface-1 text-text-secondary transition-all duration-200 hover:border-hairline-strong hover:bg-surface-2 hover:text-text-primary lg:hidden"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-hairline bg-surface-1 text-text-secondary transition-all duration-200 hover:border-hairline-strong hover:bg-surface-2 hover:text-text-primary xl:hidden"
               >
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.span
@@ -331,7 +343,7 @@ export function Navbar() {
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"
-            className="fixed inset-0 z-[999] flex flex-col lg:hidden"
+            className="fixed inset-0 z-[999] flex flex-col xl:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

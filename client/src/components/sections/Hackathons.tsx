@@ -10,6 +10,7 @@ import { hackathons } from "../../data/hackathons";
 
 const achievementColors: Record<string, string> = {
   Finalist: "#F59E0B",
+  "Grand Finalist": "#F59E0B",
   "Team Lead": "#A855F7",
   "Solo Builder": "#10B981",
   Participant: "#3B82F6",
@@ -52,7 +53,7 @@ export function Hackathons() {
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-12">
             {[
               { label: "Hackathons", value: "5", icon: Award },
-              { label: "Best Rank", value: "Top 800", icon: Code2 },
+              { label: "Best Rank", value: "Top 3%", icon: Code2 },
               { label: "Teams Led", value: "3x", icon: Users },
             ].map((stat) => (
               <StatCard

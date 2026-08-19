@@ -11,6 +11,7 @@ import type { Project } from "../types";
 export const projects: Project[] = [
   {
     id: "homedi",
+    context: "Lystra Pharma | Professional Work",
     title: "HoMedi Healthcare Platform",
     slug: "homedi-healthcare-platform",
     tagline: "Full-Stack Healthcare & Home-Care Platform",
@@ -41,6 +42,13 @@ export const projects: Project[] = [
   },
   {
     id: "vayu-drishti",
+    resumeStack: ["Next.js", "Express.js", "MongoDB", "FastAPI", "PyTorch"],
+    onResume: true,
+    resumeBullets: [
+      "Architected a three-tier system — Next.js dashboard, Express.js/MongoDB API gateway and FastAPI ML service — with all model requests proxied through the gateway and every scenario persisted, keeping the ML service isolated from clients",
+      "Served ConvLSTM deep-learning forecasts (1-, 7- and 30-day horizons over a 31x31 grid) on an interactive MapLibre GL map with temporal scrubbing, live telemetry over Socket.IO with REST polling fallback, and a drought/flood what-if simulator",
+    ],
+    context: "Personal Project",
     title: "VAYU-DRISHTI",
     slug: "vayu-drishti-climate-digital-twin",
     tagline: "Climate Digital Twin OS for India",
@@ -85,6 +93,13 @@ export const projects: Project[] = [
   },
   {
     id: "smart-mentor",
+    onResume: true,
+    resumeBullets: [
+      "Led Team INVOTEX and built the real-time layer end-to-end: FastAPI WebSocket services streaming live learning signals to Next.js clients on each channel",
+      "Implemented Bayesian Knowledge Tracing — a probabilistic model that estimates in real time which concepts a student has mastered — and semantic doubt retrieval over a FAISS vector index using sentence-transformers embeddings",
+    ],
+    context: "SIH 2025, Team Lead",
+    resumeStack: ["Next.js", "FastAPI", "WebSockets", "FAISS"],
     title: "Smart Mentor",
     slug: "smart-mentor",
     tagline: "Real-Time Adaptive Learning Platform",
@@ -128,28 +143,36 @@ export const projects: Project[] = [
   },
   {
     id: "openenv-invotex",
+    onResume: true,
+    resumeBullets: [
+      "Built OpenEnv-compliant reinforcement-learning environment APIs across three enterprise domains (Email Triage, Customer Support, Traffic Control) with a deterministic, Docker-containerized evaluation harness so agent runs stay repeatable and comparable",
+      "Trained agents against injected failure — live schema drift, 403s and permission errors — cutting training loss 3.8 to 0.14 in 60 steps, with LLaMA-3 8B scoring 0.65+ where Qwen-72B scored 0.00",
+    ],
+    context: "Meta PyTorch Hackathon",
+    resumeStack: ["Python", "Docker"],
     title: "OpenEnv Invotex",
     slug: "openenv-invotex",
     tagline: "RL Environment for LLM-Agent Benchmarking",
     description:
-      "A containerized, multi-domain reinforcement-learning environment for benchmarking LLM agents on real-world workflows — Email, Traffic, and Customer Support. Finalist and Team Lead at the Meta PyTorch OpenEnv Hackathon (Top 800 of 31,000+ teams).",
+      "A multi-domain reinforcement-learning environment that trains LLM agents against failure instead of ideal conditions — injecting live schema drift, 403s and permission errors across Email Triage, Customer Support and Traffic Control. Grand Finalist and Team Lead at the Meta × PyTorch OpenEnv Hackathon (top 3% of 31,000+ teams).",
     problem:
-      "Evaluating LLM agents on realistic, repeatable tasks is hard — most benchmarks aren't deterministic or representative of real-world workflows.",
+      "Most AI agents fail in production for reasons a benchmark never shows them: an API changes shape mid-execution, a permission breaks, a call returns 403. Agents trained only on ideal conditions have never met any of it.",
     solution:
-      "An OpenEnv-compliant environment with deterministic evaluation and a scalable containerized architecture, spanning multiple real-world task domains.",
+      "Instead of avoiding failure, simulate it during training. An OpenEnv-compliant environment injects live schema drift and error conditions across three enterprise domains, with nine tasks over three difficulty levels and a deterministic, containerized harness so runs stay comparable.",
     contribution:
-      "Led the team and built the OpenEnv-compliant environment APIs and the deterministic evaluation harness across the three task domains.",
+      "Led a team of three and built the OpenEnv-compliant environment APIs and the deterministic evaluation harness across the three task domains.",
     impact:
-      "Finalist — Top 800 of 31,000+ teams; selected to present at the Meta PyTorch finals in Bangalore.",
+      "Grand Finalist — top 3% of 31,000+ teams. Training loss fell 3.8 → 0.14 in 60 steps, and LLaMA-3 8B scored 0.65+ where Qwen-72B scored 0.00: robust training beat model size.",
     challenges:
-      "Guaranteeing deterministic, repeatable agent evaluation inside containerized environments spanning very different task domains.",
-    techStack: ["Python", "PyTorch", "Reinforcement Learning", "Docker", "Jupyter"],
+      "Guaranteeing deterministic, repeatable evaluation while deliberately injecting non-deterministic failure — the drift and error conditions had to be reproducible per seed, or no two agent runs would be comparable.",
+    techStack: ["Python", "PyTorch", "Reinforcement Learning", "Docker", "LLaMA-3", "Jupyter"],
     features: [
-      "Multi-domain RL environments (Email, Traffic, Support)",
-      "OpenEnv-compliant APIs",
-      "Deterministic, repeatable evaluation",
-      "Scalable containerized architecture",
-      "Selected to present at the finals in Bangalore",
+      "Three enterprise domains: Email Triage, Customer Support, Traffic Control",
+      "Real-time schema-drift injection — APIs change shape mid-execution",
+      "Failure simulation: 403s, permission breaks, unexpected responses",
+      "9 tasks across 3 difficulty levels",
+      "OpenEnv-compliant APIs with deterministic, repeatable evaluation",
+      "Benchmarked LLaMA-3 8B against Qwen-72B",
     ],
     repo: "Meta-open_env_project",
     featured: true,
@@ -158,6 +181,7 @@ export const projects: Project[] = [
   },
   {
     id: "ai-workflow-project",
+    context: "Personal Project",
     title: "AI Workflow",
     slug: "ai-workflow-project",
     tagline: "Production AI Workflow App",
@@ -186,6 +210,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-website",
+    context: "Personal Project",
     title: "Portfolio Website",
     slug: "portfolio-website",
     tagline: "This Site — Next.js 15 + Live GitHub Data",
@@ -217,6 +242,7 @@ export const projects: Project[] = [
   },
   {
     id: "contentops-ai",
+    context: "Bengaluru AI Hack Day | Solo Builder",
     title: "ContentOps AI",
     slug: "contentops-ai",
     tagline: "Agentic Content Operations Platform",

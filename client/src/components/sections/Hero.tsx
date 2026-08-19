@@ -75,22 +75,9 @@ export function Hero() {
         animate="visible"
       >
         <div className="mx-auto max-w-4xl text-center">
-          {/* Profile avatar — swap the initials block for a <next/image> when the
-              real photo is added to /public. */}
-          <motion.div variants={itemVariants} className="mb-6 flex justify-center">
-            <div className="relative">
-              <div className="rounded-full bg-gradient-to-br from-accent-blue via-accent-purple to-accent-cyan p-[2px]">
-                <div className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-background">
-                  <span className="font-display text-2xl font-bold gradient-text-tri">SK</span>
-                </div>
-              </div>
-              {/* Availability dot */}
-              <span className="absolute bottom-1 right-1 flex h-3.5 w-3.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-                <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-background bg-emerald-400" />
-              </span>
-            </div>
-          </motion.div>
+          {/* No avatar here by choice — at 76px a photograph reads as a generic
+              icon and competes with the headline for the eye. The photograph
+              earns its place in About, at a size where the setting is legible. */}
 
           {/* Availability badge */}
           <motion.div variants={itemVariants} className="mb-6">

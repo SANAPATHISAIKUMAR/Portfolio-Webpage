@@ -3,19 +3,22 @@
 import { Printer } from "lucide-react";
 
 /**
- * Triggers the browser's print dialog, where "Save as PDF" produces the
- * downloadable résumé. Keeps /resume a server component — only this button
- * needs the client.
+ * Secondary action on /resume: print the page.
+ *
+ * The primary action is a real PDF download (a plain <a download> in the server
+ * component, so it needs no JS). This stays as a fallback for anyone who wants
+ * to print directly or save with their own page setup — the @media print rules
+ * in globals.css strip the site chrome either way.
  */
 export function PrintButton() {
   return (
     <button
       type="button"
       onClick={() => window.print()}
-      className="inline-flex h-10 items-center gap-2 rounded-lg border border-hairline-strong bg-surface-1 px-4 text-sm font-medium text-text-primary transition-colors hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/50"
+      className="inline-flex h-10 items-center gap-2 rounded-lg border border-hairline bg-surface-1 px-4 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/50"
     >
       <Printer size={15} aria-hidden />
-      Download PDF
+      Print
     </button>
   );
 }

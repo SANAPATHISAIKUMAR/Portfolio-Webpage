@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Mail, MapPin, Globe } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "../../components/ui/SocialIcons";
+import { ArrowLeft, Download } from "lucide-react";
 import { PrintButton } from "../../components/ui/PrintButton";
 import { siteConfig } from "../../config/site";
 import { getSiteUrl } from "../../config/site-url";
@@ -11,16 +10,22 @@ import { skillGroups } from "../../data/skills";
 import { projects } from "../../data/projects";
 import { hackathons } from "../../data/hackathons";
 import { certifications } from "../../data/certifications";
+import { education } from "../../data/education";
 import { formatDateRange } from "../../lib/utils";
 
 /**
- * A real résumé page, not a link to a PDF that was never committed.
+ * The one-page placements résumé.
  *
- * The hero/nav/footer "Resume" buttons used to point at
- * /resume/SaiKumar_Resume.pdf, which 404s — the single worst broken link on a
- * job-seeking portfolio. This renders the same content as selectable, semantic,
- * ATS-parseable HTML, and the print stylesheet turns Ctrl/Cmd+P into a clean
- * A4 PDF.
+ * Structure and density follow Sai_Kumar_Resume_Placements_Optimized.pdf:
+ * Summary, Education, Technical Skills, Experience, Projects, Hackathons &
+ * Achievements, Certifications. Deliberately leaner than the site — three
+ * projects rather than seven, and résumé-specific bullets and stack lines rather
+ * than the site's fuller feature lists — because a one-page résumé that lists
+ * everything ranks nothing.
+ *
+ * Content is read from the same data files as the rest of the site, so the page
+ * cannot drift from the portfolio. `npm run resume:pdf` snapshots it to
+ * public/resume/ as the downloadable PDF.
  */
 
 export const metadata: Metadata = {
@@ -29,25 +34,17 @@ export const metadata: Metadata = {
   alternates: { canonical: "/resume" },
 };
 
-const EDUCATION = {
-  degree: "B.Tech, Computer Science (AI & Machine Learning)",
-  institution: "Dhanalakshmi Srinivasan University",
-  period: "2023 — Present",
-};
+/** The three the placements résumé leads with, in data order. */
+const RESUME_PROJECTS = projects.filter((p) => p.onResume);
 
-/** Projects worth a résumé line, strongest first. */
-const RESUME_PROJECTS = projects.slice(0, 4);
+/** Four achievements, as on the placements résumé — VIBEATHON is site-only. */
+const RESUME_HACKATHONS = hackathons.filter((h) => h.onResume);
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+/** Section heading with a rule above and below, as in the source résumé. */
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="print-section mb-8">
-      <h2 className="print-rule mb-4 border-b border-hairline pb-2 font-display text-xs font-bold uppercase tracking-[0.18em] text-text-primary">
+    <section className="print-block mb-5">
+      <h2 className="resume-heading mb-2 border-y border-hairline py-1 font-display text-[length:var(--r-small)] font-bold uppercase tracking-[0.14em] text-text-primary">
         {title}
       </h2>
       {children}
@@ -55,18 +52,49 @@ function Section({
   );
 }
 
+/** Title left, italic meta right — the résumé's entry header pattern. */
+function EntryHead({ left, right }: { left: React.ReactNode; right?: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+      <h3 className="font-display text-[length:var(--r-h3)] font-bold text-text-primary">{left}</h3>
+      {right && <span className="text-[length:var(--r-small)] italic text-text-muted">{right}</span>}
+    </div>
+  );
+}
+
+function Bullets({ items }: { items: string[] }) {
+  if (items.length === 0) return null;
+  return (
+    <ul className="mt-1 space-y-0.5">
+      {items.map((item) => (
+        <li key={item} className="flex gap-2 text-[length:var(--r-body)] leading-snug text-text-secondary">
+          {/* print-bullet re-inks the dot for print — the blanket
+              `background: transparent` print rule would otherwise erase it. */}
+          <span
+            aria-hidden
+            className="print-bullet mt-[5px] h-[3px] w-[3px] shrink-0 rounded-full bg-text-muted"
+          />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function ResumePage() {
   const siteUrl = getSiteUrl();
   const linkedIn = siteConfig.links.find((l) => l.platform === "LinkedIn")?.url;
 
+  // Only advertise the portfolio URL once it is a real origin — otherwise the
+  // résumé, and any PDF generated from it locally, lists "localhost:3000".
+  const isPublicSite = !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(siteUrl);
+  const strip = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
   return (
     <main className="relative">
-      <div className="section-container max-w-4xl pt-28 pb-24 md:pt-32">
+      <div className="print-page section-container max-w-4xl pt-28 pb-24 md:pt-32">
         {/* Screen-only controls */}
-        <div
-          data-print-hide
-          className="mb-8 flex flex-wrap items-center justify-between gap-4"
-        >
+        <div data-print-hide className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
@@ -74,185 +102,185 @@ export default function ResumePage() {
             <ArrowLeft size={16} />
             Back to portfolio
           </Link>
-          <PrintButton />
+
+          <div className="flex items-center gap-2">
+            <PrintButton />
+            <a
+              href={siteConfig.resumePdf}
+              download
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-[var(--btn-primary-bg)] px-4 text-sm font-medium text-[var(--btn-primary-fg)] transition-colors hover:bg-[var(--btn-primary-bg-hover)]"
+            >
+              <Download size={15} aria-hidden />
+              Download PDF
+            </a>
+          </div>
         </div>
 
         <article className="print-document rounded-3xl border border-hairline bg-surface-1 p-8 md:p-12">
           {/* Header */}
-          <header className="print-section print-rule mb-8 border-b border-hairline pb-6">
-            <h1 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-4xl">
+          <header className="print-section mb-4">
+            <h1 className="font-display text-[length:var(--r-name)] font-bold tracking-tight text-text-primary md:text-3xl">
               {siteConfig.name}
             </h1>
-            <p className="mt-1 text-lg text-text-secondary">
-              {siteConfig.role} · {siteConfig.company}
-            </p>
+            {siteConfig.headline && (
+              <p className="mt-0.5 text-[length:var(--r-headline)] text-text-secondary">{siteConfig.headline}</p>
+            )}
 
-            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-text-secondary">
-              <li className="flex items-center gap-1.5">
-                <Mail size={14} aria-hidden />
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-text-primary">
-                  {siteConfig.email}
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <MapPin size={14} aria-hidden />
-                {siteConfig.location}
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Globe size={14} aria-hidden />
-                <a href={siteUrl} className="hover:text-text-primary">
-                  {siteUrl.replace(/^https?:\/\//, "")}
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <GithubIcon size={14} />
-                <a href={GITHUB_PROFILE_URL} className="hover:text-text-primary">
-                  {GITHUB_PROFILE_URL.replace(/^https?:\/\//, "")}
-                </a>
-              </li>
-              {linkedIn && (
-                <li className="flex items-center gap-1.5">
-                  <LinkedinIcon size={14} />
-                  <a href={linkedIn} className="hover:text-text-primary">
-                    LinkedIn
-                  </a>
-                </li>
+            <p className="mt-1.5 text-[length:var(--r-body)] leading-relaxed text-text-secondary">
+              {siteConfig.phone && (
+                <>
+                  <a href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}>{siteConfig.phone}</a>
+                  {"  |  "}
+                </>
               )}
-            </ul>
+              <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+              {"  |  "}
+              {siteConfig.location}
+            </p>
+            <p className="text-[length:var(--r-body)] leading-relaxed text-text-secondary">
+              {linkedIn && (
+                <>
+                  <span className="font-medium text-text-primary">LinkedIn:</span>{" "}
+                  <a href={linkedIn} className="text-accent-blue">
+                    {strip(linkedIn)}
+                  </a>
+                  {"  |  "}
+                </>
+              )}
+              <span className="font-medium text-text-primary">GitHub:</span>{" "}
+              <a href={GITHUB_PROFILE_URL} className="text-accent-blue">
+                {strip(GITHUB_PROFILE_URL)}
+              </a>
+              {isPublicSite && (
+                <>
+                  {"  |  "}
+                  <span className="font-medium text-text-primary">Portfolio:</span>{" "}
+                  <a href={siteUrl} className="text-accent-blue">
+                    {strip(siteUrl)}
+                  </a>
+                </>
+              )}
+            </p>
           </header>
 
           {/* Summary */}
           <Section title="Summary">
-            <p className="text-sm leading-relaxed text-text-secondary">
+            <p className="text-[length:var(--r-body)] leading-relaxed text-text-secondary">
               {siteConfig.summary}
             </p>
           </Section>
 
+          {/* Education */}
+          <Section title="Education">
+            <EntryHead left={education.degree} right={education.period} />
+            <p className="text-[length:var(--r-body)] italic text-text-secondary">{education.institution}</p>
+            <p className="mt-0.5 text-[length:var(--r-body)] text-text-secondary">
+              {education.metrics.join("  |  ")}
+            </p>
+          </Section>
+
+          {/* Technical skills */}
+          <Section title="Technical Skills">
+            <div className="space-y-0.5">
+              {skillGroups.map((group) => (
+                <p key={group.id} className="text-[length:var(--r-body)] leading-snug text-text-secondary">
+                  <span className="font-semibold text-text-primary">{group.label}:</span>{" "}
+                  {group.skills.join(", ")}
+                </p>
+              ))}
+            </div>
+          </Section>
+
           {/* Experience */}
           <Section title="Experience">
-            <div className="space-y-6">
+            <div className="space-y-3">
               {experiences.map((exp) => (
                 <div key={exp.id} className="print-section">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <h3 className="font-display text-base font-semibold text-text-primary">
-                      {exp.role}
-                      <span className="font-normal text-text-secondary"> · {exp.company}</span>
-                    </h3>
-                    <span className="text-xs text-text-muted">
-                      {formatDateRange(exp.startDate, exp.endDate)}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-text-muted">{exp.location}</p>
-                  <ul className="mt-2 space-y-1.5">
-                    {exp.achievements.map((item) => (
-                      <li
-                        key={item}
-                        className="flex gap-2 text-sm leading-relaxed text-text-secondary"
-                      >
-                        <span aria-hidden className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-text-muted" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-2 text-xs text-text-muted">
-                    <span className="font-medium text-text-secondary">Tech:</span>{" "}
-                    {exp.technologies.join(" · ")}
-                  </p>
+                  <EntryHead
+                    left={`${exp.role}, ${exp.company} | ${exp.location}`}
+                    right={formatDateRange(exp.startDate, exp.endDate)}
+                  />
+                  {exp.resumeContext && (
+                    <p className="text-[length:var(--r-meta)] italic text-text-muted">
+                      {exp.resumeContext}
+                    </p>
+                  )}
+                  <Bullets items={exp.achievements} />
                 </div>
               ))}
             </div>
           </Section>
 
           {/* Projects */}
-          <Section title="Selected Projects">
-            <div className="space-y-5">
+          <Section title="Projects">
+            <div className="space-y-3">
               {RESUME_PROJECTS.map((project) => (
                 <div key={project.id} className="print-section">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <h3 className="font-display text-base font-semibold text-text-primary">
-                      {project.title}
-                      <span className="font-normal text-text-secondary"> · {project.tagline}</span>
-                    </h3>
-                    {project.repo && (
-                      <a
-                        href={repoUrl(project.repo)}
-                        className="text-xs text-text-muted hover:text-text-primary"
-                      >
-                        github.com/…/{project.repo}
-                      </a>
-                    )}
-                  </div>
-                  <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">
-                    {project.contribution ?? project.description}
-                  </p>
-                  {project.impact && (
-                    <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                      <span className="font-medium">Impact:</span> {project.impact}
-                    </p>
-                  )}
-                  <p className="mt-1.5 text-xs text-text-muted">
-                    <span className="font-medium text-text-secondary">Tech:</span>{" "}
-                    {project.techStack.join(" · ")}
-                  </p>
+                  <EntryHead
+                    left={
+                      <>
+                        {project.title}, {project.tagline}
+                        {project.context ? (
+                          <span className="font-normal text-text-muted"> | {project.context}</span>
+                        ) : null}
+                        {project.repo && (
+                          <>
+                            {" | "}
+                            <a href={repoUrl(project.repo)} className="text-accent-blue">
+                              GitHub
+                            </a>
+                          </>
+                        )}
+                      </>
+                    }
+                    right={(project.resumeStack ?? project.techStack.slice(0, 5)).join(", ")}
+                  />
+                  <Bullets items={project.resumeBullets ?? []} />
                 </div>
               ))}
             </div>
           </Section>
 
-          {/* Skills */}
-          <Section title="Technical Skills">
-            <dl className="space-y-2">
-              {skillGroups.map((group) => (
-                <div key={group.id} className="flex flex-wrap gap-x-2 text-sm">
-                  <dt className="font-medium text-text-primary">{group.label}:</dt>
-                  <dd className="flex-1 text-text-secondary">{group.skills.join(" · ")}</dd>
-                </div>
-              ))}
-            </dl>
-          </Section>
-
-          {/* Education */}
-          <Section title="Education">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-              <h3 className="font-display text-base font-semibold text-text-primary">
-                {EDUCATION.degree}
-              </h3>
-              <span className="text-xs text-text-muted">{EDUCATION.period}</span>
-            </div>
-            <p className="mt-0.5 text-sm text-text-secondary">{EDUCATION.institution}</p>
-          </Section>
-
-          {/* Hackathons & recognition */}
-          {hackathons.length > 0 && (
-            <Section title="Hackathons & Recognition">
-              <ul className="space-y-2">
-                {hackathons.map((h) => (
-                  <li key={h.id} className="text-sm leading-relaxed text-text-secondary">
-                    <span className="font-medium text-text-primary">{h.name}</span>
-                    {h.organizer && <span className="text-text-muted"> · {h.organizer}</span>}
-                    <span className="text-text-muted"> · {h.date}</span>
-                    <br />
+          {/* Achievements */}
+          <Section title="Hackathons & Achievements">
+            <ul className="space-y-0.5">
+              {RESUME_HACKATHONS.map((h) => (
+                <li
+                  key={h.id}
+                  className="flex gap-2 text-[length:var(--r-body)] leading-snug text-text-secondary"
+                >
+                  <span
+                    aria-hidden
+                    className="print-bullet mt-[5px] h-[3px] w-[3px] shrink-0 rounded-full bg-text-muted"
+                  />
+                  <span>
+                    <span className="font-semibold text-text-primary">{h.name}:</span>{" "}
                     {h.achievement}
-                    {h.position ? ` — ${h.position}` : ""}
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
+                    {h.position ? `, ${h.position.toLowerCase()}` : ""}
+                    {h.projectName ? `. Built ${h.projectName}` : ""}.
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Section>
 
-          {/* Certifications — renders only once real entries exist */}
+          {/* Certifications */}
           {certifications.length > 0 && (
             <Section title="Certifications">
-              <ul className="space-y-1.5">
-                {certifications.map((cert) => (
-                  <li key={cert.id} className="text-sm text-text-secondary">
-                    <span className="font-medium text-text-primary">{cert.title}</span> ·{" "}
-                    {cert.issuer} · {cert.date}
-                  </li>
+              <p className="text-[length:var(--r-body)] leading-snug text-text-secondary">
+                {certifications.map((c, i) => (
+                  <span key={c.id}>
+                    {i > 0 && "  |  "}
+                    <span className="font-medium text-text-primary">{c.title}</span>
+                    {" — "}
+                    {c.issuer}
+                    {c.detail ? ` (${c.detail})` : ""}
+                  </span>
                 ))}
-              </ul>
+              </p>
             </Section>
           )}
+
         </article>
       </div>
     </main>

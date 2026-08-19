@@ -18,6 +18,31 @@ export interface Project {
   challenges?: string;
   techStack: string[];
   features: string[];
+  /**
+   * Where the work happened and in what role — "Meta PyTorch Hackathon | Team
+   * Lead", "Personal Project". Shown right-aligned beside the title on the
+   * résumé, mirroring the ATS layout. Unused by the website itself.
+   */
+  context?: string;
+  /**
+   * Tight, technical bullets written for the one-page résumé. Deliberately
+   * separate from `features`: the site sells the project's scope, the résumé
+   * sells the engineering, and the two want different prose at different
+   * lengths. Only projects with `onResume` need these.
+   */
+  resumeBullets?: string[];
+  /**
+   * Stack line for the résumé, when it differs from `techStack`. The site lists
+   * everything a repo actually contains; the résumé lists the few technologies
+   * worth a recruiter's attention. Falls back to `techStack` when unset.
+   */
+  resumeStack?: string[];
+  /**
+   * Include on the one-page résumé. The site shows every project; the résumé
+   * shows the three the placements résumé leads with, because a page that
+   * lists everything ranks nothing.
+   */
+  onResume?: boolean;
   /** Cover screenshot under /public. Cards fall back to a generated gradient. */
   image?: string;
   screenshots?: string[];
@@ -45,18 +70,22 @@ export interface Experience {
   description: string;
   achievements: string[];
   technologies: string[];
+  /**
+   * Extra context line on the résumé, e.g. the product worked on. Only set
+   * where the placements résumé carries one — the internships list role,
+   * company and location on a single line and go straight to the bullet.
+   */
+  resumeContext?: string;
   type: "fulltime" | "internship" | "freelance" | "contract";
 }
 
 export type SkillCategory =
-  | "frontend"
-  | "backend"
-  | "database"
-  | "cloud"
-  | "devops"
   | "languages"
-  | "ai"
-  | "design";
+  | "backend"
+  | "frontend"
+  | "databases"
+  | "tools"
+  | "ai";
 
 /**
  * A category of skills rendered as a card. No self-assigned proficiency
@@ -82,6 +111,8 @@ export interface Hackathon {
   position?: string;
   teamSize?: number;
   projectName?: string;
+  /** Include in the one-page résumé's Achievements list. */
+  onResume?: boolean;
 }
 
 export interface Achievement {
@@ -105,10 +136,16 @@ export interface Certification {
   id: string;
   title: string;
   issuer: string;
-  /** Human-readable issue date, e.g. "Mar 2025". */
-  date: string;
+  /**
+   * Human-readable issue date, e.g. "Mar 2025". Optional: the résumé these were
+   * taken from doesn't record dates, and an invented date on a credential is
+   * worse than no date. Every consumer renders it conditionally.
+   */
+  date?: string;
   /** Public verification/credential URL. */
   credentialUrl?: string;
+  /** Qualifier shown after the issuer, e.g. "3 courses". */
+  detail?: string;
   /** Path under /public to the certificate image (png/jpg/webp). */
   image?: string;
   /** Skills the certificate attests to. */
@@ -135,8 +172,14 @@ export interface SiteConfig {
   links: SocialLink[];
   email: string;
   location: string;
-  /** Where the "Resume" buttons point. */
+  /** Where the "Resume" buttons point — the on-site résumé page. */
   resume: string;
+  /**
+   * The downloadable PDF, generated from that page by `npm run resume:pdf`.
+   * Kept separate so the nav can link to the readable page while the download
+   * button serves a real file.
+   */
+  resumePdf: string;
   /** Current job title, e.g. "Associate Software Engineer". */
   role?: string;
   /** Current employer. */
@@ -145,6 +188,10 @@ export interface SiteConfig {
   availability?: string;
   /** One-line professional summary reused across sections. */
   summary?: string;
+  /** E.164-ish display number, e.g. "+91 73860 27037". Résumé header only. */
+  phone?: string;
+  /** Sub-headline under the name on the résumé, e.g. "B.Tech CSE (AI & ML) | …". */
+  headline?: string;
 }
 
 /**

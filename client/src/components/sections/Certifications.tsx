@@ -67,10 +67,12 @@ export function Certifications() {
                 >
                   <Award size={20} />
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-text-muted">
-                  <Calendar size={12} />
-                  {cert.date}
-                </span>
+                {cert.date && (
+                  <span className="flex items-center gap-1.5 text-xs text-text-muted">
+                    <Calendar size={12} />
+                    {cert.date}
+                  </span>
+                )}
               </div>
 
               <span className="mb-1 block font-display text-base font-semibold text-text-primary">
@@ -119,7 +121,9 @@ export function Certifications() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-text-primary">{active.issuer}</p>
-                <p className="text-xs text-text-muted">Issued {active.date}</p>
+                {active.date && (
+                  <p className="text-xs text-text-muted">Issued {active.date}</p>
+                )}
               </div>
               {active.credentialUrl && (
                 <a

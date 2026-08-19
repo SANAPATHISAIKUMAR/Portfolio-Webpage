@@ -1,73 +1,64 @@
 import type { Experience } from "../types";
 
-// Reverse-chronological: current role first, then internships (Zidio Jul–Oct 2025,
-// Cognifyz Mar–Apr 2025). Source of truth: ATS résumé + confirmed sequence
-// (internships first, then Lystra).
+// Reverse-chronological. Source of truth: the placements résumé
+// (Sai_Kumar_Resume_Placements.pdf) — roles, dates, locations and bullets are
+// taken from it verbatim in substance.
 //
-// NOTE: Lystra is not on the résumé (it started Jan 2026, after the internships).
-// The bullets below are intentionally modest and factual — replace with your real
-// achievements/metrics when ready.
+// Note Lystra began Apr 2026, not Jan 2026 as an earlier version of this file
+// claimed, and it is a remote role. Both were wrong here and on the résumé.
 export const experiences: Experience[] = [
   {
     id: "lystra-pharma",
     role: "Associate Software Engineer",
-    company: "Lystra Pharma",
+    company: "Lystra Pharma Private Limited",
     companyUrl: "https://lystrapharma.com",
-    location: "Visakhapatnam, India",
-    startDate: "2026-01",
+    location: "Remote",
+    startDate: "2026-04",
     description:
-      "MERN-stack development for a healthcare technology platform — building REST APIs, backend services, and responsive React interfaces used across the product.",
+      "HoMedi, a home healthcare booking and service management platform — REST APIs, authentication and role-based React dashboards on a live production system.",
+    resumeContext: "HoMedi — home healthcare booking and service management platform (live in production)",
     achievements: [
-      "Develop and maintain REST APIs and backend services on the MERN stack",
-      "Build responsive React interfaces for a healthcare technology platform",
-      "Collaborate with the team to ship and iterate on product features",
+      "Develop and maintain REST APIs and backend services (Node.js, Express.js, MongoDB) for the booking flow, service catalog and provider-management modules of a live production healthcare platform",
+      "Implement JWT authentication and role-based authorization separating patient, provider and administrator access across all protected routes",
+      "Build responsive, mobile-first React dashboards for all three user roles, integrate them with backend APIs, and iterate on features with the product and design team",
     ],
     technologies: [
-      "React", "Node.js", "Express", "MongoDB", "TypeScript",
-      "TailwindCSS", "REST APIs",
+      "Node.js", "Express.js", "MongoDB", "React", "REST APIs", "JWT",
     ],
     type: "fulltime",
   },
   {
     id: "zidio-development",
-    role: "UX/UI Designer",
+    role: "UX and UI Designer Intern",
     company: "Zidio Development",
     companyUrl: "https://zidio.in",
     location: "Remote",
     startDate: "2025-07",
     endDate: "2025-10",
     description:
-      "Designed user-centered interfaces and ran usability research for web products, translating product concepts into clean, functional designs alongside engineering and product teams.",
+      "Wireframes, user flows and high-fidelity interfaces for web products, validated with usability testing.",
     achievements: [
-      "Created user-centered designs and wireframes using Figma and Adobe XD",
-      "Collaborated with product managers and developers to turn concepts into functional interfaces",
-      "Conducted user research and usability testing to inform design decisions",
+      "Designed wireframes, user flows and high-fidelity interfaces in Figma and Adobe XD, and ran usability testing",
     ],
     technologies: [
-      "Figma", "Adobe XD", "Wireframing", "Prototyping",
-      "User Research", "Responsive Design",
+      "Figma", "Adobe XD", "Wireframing", "User Flows", "Usability Testing",
     ],
     type: "internship",
   },
   {
     id: "cognifyz-technologies",
-    role: "Frontend Engineer",
+    role: "Frontend Developer Intern",
     company: "Cognifyz Technologies",
     companyUrl: "https://cognifyz.com",
     location: "Remote",
     startDate: "2025-03",
     endDate: "2025-04",
     description:
-      "Built responsive, interactive user interfaces and integrated REST APIs as a Frontend Engineer, focusing on cross-browser reliability and performance.",
+      "Responsive React interfaces and REST API integration, with a focus on frontend page-load performance.",
     achievements: [
-      "Built responsive, interactive UIs with HTML, CSS, JavaScript, and React.js",
-      "Integrated RESTful APIs and debugged UI issues across browsers and devices",
-      "Improved frontend performance, cutting page load time by ~45%",
-      "Maintained version control with Git/GitHub in a collaborative remote team",
+      "Built responsive React.js interfaces, integrated REST APIs, and optimized asset loading and rendering to improve frontend page-load performance",
     ],
-    technologies: [
-      "React", "JavaScript", "HTML", "CSS", "REST APIs", "Git",
-    ],
+    technologies: ["React", "JavaScript", "HTML5", "CSS3", "REST APIs", "Git"],
     type: "internship",
   },
 ];
